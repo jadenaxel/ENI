@@ -17,6 +17,7 @@ const AdBanner: FC<any> = ({ ID }: { ID: string }): JSX.Element => {
 const styles = StyleSheet.create({
 	bannerAd: {
 		position: "absolute",
+		zIndex: 1,
 		bottom: 0,
 		width: Sizes.windowWidth,
 	},

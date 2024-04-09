@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
 	},
 	text: {
 		color: Colors.text,
-		fontSize: Sizes.windowWidth / 25,
+		fontSize: Sizes.ajustFontSize(16),
 	},
 });
 

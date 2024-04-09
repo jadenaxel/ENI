@@ -26,6 +26,13 @@ const Tab: FC = (): JSX.Element => {
 				}}
 			/>
 			<Tabs.Screen
+				name="favorite"
+				options={{
+					title: "Favorite",
+					tabBarIcon: () => <Feather size={25} name="heart" color={Colors.text} />,
+				}}
+			/>
+			<Tabs.Screen
 				name="search"
 				options={{
 					title: "Search",

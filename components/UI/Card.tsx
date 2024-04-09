@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
 	cardTitle: {
 		color: Colors.text,
 		textAlign: "center",
-        fontSize: Sizes.windowWidth / 30,
-        fontWeight: "bold"
+		fontSize: Sizes.ajustFontSize(15),
+		fontWeight: "bold",
 	},
 });
 

@@ -6,11 +6,13 @@ import { createContext, useReducer } from "react";
 // Initializing values to state
 const initialValue: any = {
 	Data: "",
+	SeriesItem: "",
 };
 
 //  Creating actions names and exporting them
 export const Actions: any = {
 	All: "All",
+	SeriesItem: "Series Item",
 };
 
 // Reducer function
@@ -19,6 +21,8 @@ const reducer = (state: any, action: any): any => {
 	switch (action.type) {
 		case Actions.All:
 			return { ...state, Data: action.payload };
+		case Actions.SeriesItem:
+			return { ...state, SeriesItem: action.payload };
 		default:
 			return state;
 	}
