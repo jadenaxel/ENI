@@ -2,4 +2,6 @@ import { Dimensions } from "react-native";
 
 export default {
 	windowWidth: Dimensions.get("window").width,
+
+	paddingHorizontal: 16,
 };

@@ -15,7 +15,7 @@ const Tab: FC = (): JSX.Element => {
 					borderTopWidth: 0,
 				},
 				tabBarActiveTintColor: Colors.text,
-				tabBarInactiveTintColor: "#0e2",
+				tabBarInactiveTintColor: Colors.Tint,
 			}}
 		>
 			<Tabs.Screen
