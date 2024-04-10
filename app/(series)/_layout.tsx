@@ -10,6 +10,7 @@ const Tab: FC = (): JSX.Element => {
 			}}
 		>
 			<Stack.Screen name="item" />
+			<Stack.Screen name="chapter" />
 		</Stack>
 	);
 };

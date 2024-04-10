@@ -52,8 +52,6 @@ const Home: FC = (): JSX.Element => {
 	if (error[0]) return <Error />;
 	if (isLoading) return <Loader />;
 
-	console.log(data);
-
 	return (
 		<SafeAreaView style={styles.main}>
 			<AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />

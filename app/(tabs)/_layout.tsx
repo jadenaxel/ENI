@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { Tabs } from "expo-router";
 
 import { Feather } from "@expo/vector-icons";
-import { Colors } from "@/config";
+import { Colors, Sizes } from "@/config";
 
 const Tab: FC = (): JSX.Element => {
 	return (
@@ -16,6 +16,9 @@ const Tab: FC = (): JSX.Element => {
 				},
 				tabBarActiveTintColor: Colors.text,
 				tabBarInactiveTintColor: Colors.Tint,
+				tabBarLabelStyle: {
+					fontSize: Sizes.ajustFontSize(13),
+				},
 			}}
 		>
 			<Tabs.Screen

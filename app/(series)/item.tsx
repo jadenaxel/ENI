@@ -1,24 +1,60 @@
 import type { FC } from "react";
 
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, Modal } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { Link, router } from "expo-router";
 
-import { Context } from "@/Wrapper";
-import { Colors, Sizes } from "@/config";
+import { Actions, Context } from "@/Wrapper";
+import { Ads, Colors, Sizes } from "@/config";
+
+import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
+
+const SeasonModal: FC<any> = ({ modalVisible, setModalVisible, setSelectedSeason, data }: any): JSX.Element => (
+	<Modal visible={modalVisible} animationType="slide" transparent>
+		<View style={styles.modal}>
+			<ScrollView style={{ marginBottom: 30 }}>
+				{data.map((item: any, i: number) => {
+					return (
+						<Pressable
+							key={i}
+							onPress={() => {
+								setSelectedSeason(item.title);
+								setModalVisible(false);
+							}}
+						>
+							<Text style={styles.seasonTitleModal}>{item.title}</Text>
+						</Pressable>
+					);
+				})}
+			</ScrollView>
+
+			<Pressable style={styles.closeModal} onPress={() => setModalVisible(false)}>
+				<Feather name="x" size={20} color={Colors.background} />
+			</Pressable>
+		</View>
+	</Modal>
+);
 
 const Item: FC = (): JSX.Element => {
-	const { state }: any = useContext(Context);
+	const { state, dispatch }: any = useContext(Context);
 	const ItemData: any = state.SeriesItem;
 
+	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [selectedSeason, setSelectedSeason] = useState<string>(ItemData.season?.at(-1).title ?? "");
+
+	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+
 	const { background, cover, title, description, season, link } = ItemData;
-
-	console.log(link);
-
 	const chapterColor: string = background.asset.metadata.palette.darkMuted.background;
+
+	useEffect(() => {
+		load();
+	}, [load]);
 
 	return (
 		<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
@@ -35,37 +71,59 @@ const Item: FC = (): JSX.Element => {
 						<Text style={styles.description} numberOfLines={6}>
 							{description}
 						</Text>
-						<Feather name="heart" size={25} color={"white"} style={styles.favorite} />
+						{/* <Feather name="heart" size={25} color={"white"} style={styles.favorite} /> */}
 					</View>
 				</View>
 			</ImageBackground>
 			{season && (
 				<View style={styles.season}>
-					{season.map((item: any, i: number) => {
-						return (
-							<View key={i}>
-								<Text style={styles.seasonTitle}>{item.title}</Text>
-								{item.chapter &&
-									item.chapter.map((item: any, key: number) => {
-										return (
-											<Pressable key={key} style={[styles.chapter, { backgroundColor: chapterColor }]}>
-												<Text style={styles.chapterTitle}>{item.title}</Text>
-												<Pressable onPress={() => Linking.openURL(item.link[0])}>
-													<Feather name="download" size={25} color={Colors.text} />
-												</Pressable>
-											</Pressable>
-										);
-									})}
-							</View>
-						);
-					})}
+					<Pressable style={styles.selectSeason} onPress={() => setModalVisible(true)}>
+						<Text style={styles.selectSeasonTitle}>{selectedSeason}</Text>
+						<Feather name="chevron-down" size={20} color={Colors.text} />
+					</Pressable>
+					{season
+						.sort((a: any, b: any) => b.title.localeCompare(a.title))
+						.map((item: any, i: number) => {
+							if (selectedSeason === item.title)
+								return (
+									<View key={i}>
+										{item.chapter &&
+											item.chapter.map((item: any, key: number) => {
+												return (
+													<Link href={"/(series)/chapter"} key={key} style={[styles.chapter, { backgroundColor: chapterColor }]} asChild>
+														<Pressable
+															onPress={() => {
+																dispatch({ type: Actions.Links, payload: item });
+																if (isLoaded) show();
+															}}
+														>
+															<Text style={styles.chapterTitle}>{item.title}</Text>
+															<Pressable onPress={() => Linking.openURL(item.link[0])}>
+																<Feather name="download" size={25} color={Colors.text} />
+															</Pressable>
+														</Pressable>
+													</Link>
+												);
+											})}
+									</View>
+								);
+							return null;
+						})}
 				</View>
 			)}
 			{season === undefined && (
 				<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieLink, { backgroundColor: chapterColor }]}>
-					<Feather name="download" size={25} color={Colors.text} />
+					<Feather name="download" size={20} color={Colors.text} />
 					<Text style={styles.downloadMovie}>Descargar</Text>
 				</Pressable>
+			)}
+			{season && (
+				<SeasonModal
+					modalVisible={modalVisible}
+					setModalVisible={setModalVisible}
+					setSelectedSeason={setSelectedSeason}
+					data={season.sort((a: any, b: any) => a.title.localeCompare(b.title))}
+				/>
 			)}
 		</ScrollView>
 	);
@@ -116,9 +174,40 @@ const styles = StyleSheet.create({
 	season: {
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
+	// Modal
+	selectSeason: {
+		flexDirection: "row",
+		alignItems: "center",
+		marginBottom: 20,
+	},
+	selectSeasonTitle: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(15),
+	},
+	modal: {
+		flex: 1,
+		alignItems: "center",
+		justifyContent: "space-between",
+		paddingVertical: Sizes.paddingHorizontal + 30,
+		backgroundColor: "rgba(0,0,0,.9)",
+	},
+	closeModal: {
+		backgroundColor: Colors.text,
+		width: 50,
+		height: 50,
+		borderRadius: 50,
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	seasonTitleModal: {
+		marginBottom: 40,
+		color: Colors.text,
+	},
+	// Modal
 	seasonTitle: {
 		color: Colors.text,
 		marginBottom: 15,
+		fontSize: Sizes.ajustFontSize(16),
 	},
 	chapter: {
 		borderRadius: 4,
@@ -129,6 +218,7 @@ const styles = StyleSheet.create({
 	},
 	chapterTitle: {
 		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(15),
 	},
 	movieLink: {
 		marginHorizontal: Sizes.paddingHorizontal,
@@ -136,10 +226,12 @@ const styles = StyleSheet.create({
 		padding: 10,
 		flexDirection: "row",
 		justifyContent: "center",
+		alignItems: "center",
 	},
 	downloadMovie: {
 		color: Colors.text,
 		marginLeft: 10,
+		fontSize: Sizes.ajustFontSize(15),
 	},
 });
 

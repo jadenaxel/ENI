@@ -7,12 +7,14 @@ import { createContext, useReducer } from "react";
 const initialValue: any = {
 	Data: "",
 	SeriesItem: "",
+	Links: "",
 };
 
 //  Creating actions names and exporting them
 export const Actions: any = {
 	All: "All",
 	SeriesItem: "Series Item",
+	Links: "",
 };
 
 // Reducer function
@@ -23,6 +25,8 @@ const reducer = (state: any, action: any): any => {
 			return { ...state, Data: action.payload };
 		case Actions.SeriesItem:
 			return { ...state, SeriesItem: action.payload };
+		case Actions.Links:
+			return { ...state, Links: action.payload };
 		default:
 			return state;
 	}
