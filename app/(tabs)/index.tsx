@@ -8,11 +8,11 @@ import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { Colors, Ads, Sizes } from "@/config";
-import { AdBanner, Loader, useFetch, Error, Card } from "@/components";
+import { AdBanner, Loader, useFetch, Error, Card, Title } from "@/components";
 import { Query } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
-const LAST_SERIES_SIZE: number = 10;
+const DATA_SIZE_CONTENT: number = 100;
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
@@ -21,20 +21,23 @@ const CARD_SECTION = ({ data, title, dispatch, isLoaded, show }: any) => {
 		<View>
 			<Text style={styles.lastSeriesTitle}>{title}</Text>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lastSeriesContent}>
-				{data.slice(0, LAST_SERIES_SIZE).map((item: any, i: number) => {
-					return (
-						<Link key={i} href={"/(series)/item"} asChild>
-							<Pressable
-								onPress={() => {
-									dispatch({ type: Actions.SeriesItem, payload: item });
-									if (isLoaded) show();
-								}}
-							>
-								<Card item={item} />
-							</Pressable>
-						</Link>
-					);
-				})}
+				{data
+					.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
+					.slice(0, DATA_SIZE_CONTENT)
+					.map((item: any, i: number) => {
+						return (
+							<Link key={i} href={"/(series)/item"} asChild>
+								<Pressable
+									onPress={() => {
+										dispatch({ type: Actions.SeriesItem, payload: item });
+										if (isLoaded) show();
+									}}
+								>
+									<Card item={item} />
+								</Pressable>
+							</Link>
+						);
+					})}
 			</ScrollView>
 		</View>
 	);
@@ -56,6 +59,7 @@ const Home: FC = (): JSX.Element => {
 		<SafeAreaView style={styles.main}>
 			<AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
+				<Title title="Inicio" />
 				<CARD_SECTION data={data.series} title={"Ultimas Series"} dispatch={dispatch} isLoaded={isLoaded} show={show} />
 				<CARD_SECTION data={data.movie} title={"Ultimas Peliculas"} dispatch={dispatch} isLoaded={isLoaded} show={show} />
 			</ScrollView>
@@ -70,9 +74,10 @@ const styles = StyleSheet.create({
 	},
 	lastSeriesTitle: {
 		color: Colors.text,
-		fontSize: Sizes.ajustFontSize(20),
+		fontSize: Sizes.ajustFontSize(15),
 		marginVertical: 20,
 		textTransform: "uppercase",
+		fontWeight: "bold",
 	},
 	lastSeriesContent: {
 		flexDirection: "row",

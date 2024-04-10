@@ -8,7 +8,8 @@ import { Feather } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 
 import { Actions, Context } from "@/Wrapper";
-import { Ads, Colors, Sizes } from "@/config";
+import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
+import { Option } from "@/components";
 
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
@@ -45,12 +46,30 @@ const Item: FC = (): JSX.Element => {
 	const ItemData: any = state.SeriesItem;
 
 	const [modalVisible, setModalVisible] = useState<boolean>(false);
+	const [heart, setHeart] = useState<boolean>(false);
 	const [selectedSeason, setSelectedSeason] = useState<string>(ItemData.season?.at(-1).title ?? "");
 
 	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
 
 	const { background, cover, title, description, season, link } = ItemData;
 	const chapterColor: string = background.asset.metadata.palette.darkMuted.background;
+
+	const contentType: string = season !== null ? Constants.SERIES : Constants.MOVIES;
+
+	const getStorageData = async (title: string) => {
+		const contentData = await LocalStorage.getData(contentType, title);
+		setHeart(contentData?.length > 0 ? true : false);
+	};
+
+	const handleHeart = async () => {
+		if (heart === true) await LocalStorage.removeData(contentType, ItemData);
+		if (heart === false) await LocalStorage.saveData(contentType, ItemData);
+		setHeart((prev: boolean): boolean => !prev);
+	};
+
+	useEffect(() => {
+		getStorageData(title);
+	}, []);
 
 	useEffect(() => {
 		load();
@@ -60,7 +79,9 @@ const Item: FC = (): JSX.Element => {
 		<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
 			<ImageBackground source={{ uri: background.asset.url }} style={styles.background} blurRadius={6}>
 				<View style={styles.header}>
-					<Text style={styles.title}>{title}</Text>
+					<Text numberOfLines={1} style={styles.title}>
+						{title}
+					</Text>
 					<Pressable onPress={() => router.back()}>
 						<Feather name="x" size={25} color={"white"} />
 					</Pressable>
@@ -71,7 +92,9 @@ const Item: FC = (): JSX.Element => {
 						<Text style={styles.description} numberOfLines={6}>
 							{description}
 						</Text>
-						{/* <Feather name="heart" size={25} color={"white"} style={styles.favorite} /> */}
+						<Pressable onPress={() => handleHeart()}>
+							<Feather name="heart" size={25} color={heart ? "red" : "white"} style={styles.favorite} />
+						</Pressable>
 					</View>
 				</View>
 			</ImageBackground>
@@ -112,10 +135,18 @@ const Item: FC = (): JSX.Element => {
 				</View>
 			)}
 			{season === undefined && (
-				<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieLink, { backgroundColor: chapterColor }]}>
-					<Feather name="download" size={20} color={Colors.text} />
-					<Text style={styles.downloadMovie}>Descargar</Text>
-				</Pressable>
+				<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
+					<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieLink, { backgroundColor: chapterColor }]}>
+						<Feather name="download" size={20} color={Colors.text} />
+						<Text style={styles.downloadMovie}>Descargar</Text>
+					</Pressable>
+					{link.length > 1 && (
+						<View>
+							<Text style={styles.moreOption}>Mas Opciones</Text>
+							<Option data={link.slice(0, -1)} />
+						</View>
+					)}
+				</View>
 			)}
 			{season && (
 				<SeasonModal
@@ -202,6 +233,7 @@ const styles = StyleSheet.create({
 	seasonTitleModal: {
 		marginBottom: 40,
 		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(15),
 	},
 	// Modal
 	seasonTitle: {
@@ -221,17 +253,22 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(15),
 	},
 	movieLink: {
-		marginHorizontal: Sizes.paddingHorizontal,
 		borderRadius: 4,
 		padding: 10,
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
+		marginBottom: 10,
 	},
 	downloadMovie: {
 		color: Colors.text,
 		marginLeft: 10,
 		fontSize: Sizes.ajustFontSize(15),
+	},
+	moreOption: {
+		fontSize: Sizes.ajustFontSize(15),
+		color: Colors.text,
+		marginBottom: 10,
 	},
 });
 

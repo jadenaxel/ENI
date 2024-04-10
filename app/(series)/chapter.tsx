@@ -1,11 +1,11 @@
 import type { FC } from "react";
 
 import { useContext } from "react";
-import { View, Text, StyleSheet, Pressable, Linking } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 
+import { Option } from "@/components";
 import { Colors, Sizes } from "@/config";
 import { Context } from "@/Wrapper";
-import { Feather } from "@expo/vector-icons";
 
 const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
@@ -21,16 +21,7 @@ const Chapter: FC = (): JSX.Element => {
 					<Text style={styles.noteContent}>{note}</Text>
 				</View>
 			)}
-			<View style={styles.optionContainer}>
-				{Links.link.map((item: any, i: number) => {
-					return (
-						<Pressable onPress={() => Linking.openURL(item)} key={i} style={styles.option}>
-							<Text style={styles.optionText}>Opcion {i + 1}</Text>
-							<Feather name="download" size={15} color={"white"} />
-						</Pressable>
-					);
-				})}
-			</View>
+			<Option data={Links.link} />
 		</View>
 	);
 };

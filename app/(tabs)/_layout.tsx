@@ -33,6 +33,7 @@ const Tab: FC = (): JSX.Element => {
 				options={{
 					title: "Favorite",
 					tabBarIcon: () => <Feather size={25} name="heart" color={Colors.text} />,
+					unmountOnBlur: true,
 				}}
 			/>
 			<Tabs.Screen

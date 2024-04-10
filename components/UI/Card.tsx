@@ -15,18 +15,17 @@ const Card: FC<any> = (props: any): JSX.Element => {
 };
 const styles = StyleSheet.create({
 	main: {
-		width: Sizes.windowWidth / 3,
+		width: Sizes.windowWidth / 3.46,
 	},
 	cardImage: {
-		height: 200,
+		height: 190,
 		borderRadius: 4,
 		marginBottom: 5,
 	},
 	cardTitle: {
 		color: Colors.text,
 		textAlign: "center",
-		fontSize: Sizes.ajustFontSize(15),
-		fontWeight: "bold",
+		fontSize: Sizes.ajustFontSize(13),
 	},
 });
 
