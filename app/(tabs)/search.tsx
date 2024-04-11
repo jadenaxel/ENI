@@ -68,20 +68,22 @@ const Search: FC = (): JSX.Element => {
 					<View>
 						<Text style={styles.categoriesTitle}>Descubre</Text>
 						<View style={styles.categories}>
-							{data.map((item: any, i: number) => {
-								return (
-									<Link key={i} href={"/(search)/categories"} asChild>
-										<Pressable
-											onPress={() => {
-												dispatch({ type: Actions.Categories, payload: item });
-												if (isLoaded) show();
-											}}
-										>
-											<CCard title={item.title} />
-										</Pressable>
-									</Link>
-								);
-							})}
+							{data
+								.sort((a: any, b: any) => a.title.localeCompare(b.title))
+								.map((item: any, i: number) => {
+									return (
+										<Link key={i} href={"/(search)/categories"} asChild>
+											<Pressable
+												onPress={() => {
+													dispatch({ type: Actions.Categories, payload: item });
+													if (isLoaded) show();
+												}}
+											>
+												<CCard title={item.title} />
+											</Pressable>
+										</Link>
+									);
+								})}
 						</View>
 					</View>
 				)}
@@ -111,7 +113,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
-		paddingBottom: 70,
+		paddingBottom: 80,
 	},
 	search: {
 		flexDirection: "row",

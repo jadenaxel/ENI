@@ -2,7 +2,7 @@ import type { FC } from "react";
 
 import { useContext, useState, useEffect } from "react";
 
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
@@ -39,7 +39,7 @@ const Categories: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<View style={styles.main}>
+		<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
 			<Text style={styles.title}>{categories.title}</Text>
 			<View style={styles.data}>
 				{allData.map((item: any, i: number) => {
@@ -57,7 +57,7 @@ const Categories: FC = (): JSX.Element => {
 					);
 				})}
 			</View>
-		</View>
+		</ScrollView>
 	);
 };
 const styles = StyleSheet.create({
@@ -74,8 +74,10 @@ const styles = StyleSheet.create({
 	},
 	data: {
 		flexDirection: "row",
-		gap: 10,
+		columnGap: 10,
+		rowGap: 20,
 		flexWrap: "wrap",
+		paddingBottom: 70,
 	},
 });
 
