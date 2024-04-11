@@ -4,7 +4,7 @@ import { useContext, useEffect, useState } from "react";
 
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, Modal } from "react-native";
 
-import { Feather } from "@expo/vector-icons";
+import { Feather, FontAwesome6 } from "@expo/vector-icons";
 import { Link, router } from "expo-router";
 
 import { Actions, Context } from "@/Wrapper";

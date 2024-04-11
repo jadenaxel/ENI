@@ -43,13 +43,13 @@ const Tab: FC = (): JSX.Element => {
 					tabBarIcon: () => <Feather size={20} name="search" color={Colors.text} />,
 				}}
 			/>
-			<Tabs.Screen
+			{/* <Tabs.Screen
 				name="more"
 				options={{
 					title: "Settings",
 					tabBarIcon: () => <Feather size={20} name="settings" color={Colors.text} />,
 				}}
-			/>
+			/> */}
 		</Tabs>
 	);
 };

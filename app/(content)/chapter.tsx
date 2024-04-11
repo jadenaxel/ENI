@@ -21,7 +21,10 @@ const Chapter: FC = (): JSX.Element => {
 					<Text style={styles.noteContent}>{note}</Text>
 				</View>
 			)}
-			<Option data={Links.link} />
+			<View>
+				<Text style={styles.downloads}>Descargas</Text>
+				<Option data={Links.link} />
+			</View>
 		</View>
 	);
 };
@@ -47,25 +50,10 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(15),
 		color: Colors.text,
 	},
-	optionContainer: {
-		flexDirection: "row",
-		flexWrap: "wrap",
-		gap: 10,
-	},
-	option: {
-		backgroundColor: Colors.Tint,
-		padding: 15,
-		borderRadius: 4,
-		flexDirection: "row",
-		justifyContent: "center",
-		alignItems: "center",
-		marginBottom: 10,
-		width: Sizes.windowWidth / 3.46,
-	},
-	optionText: {
+	downloads: {
+		fontSize: Sizes.ajustFontSize(20),
 		color: Colors.text,
-		marginRight: 5,
-		fontSize: Sizes.ajustFontSize(15),
+		marginBottom: 20,
 	},
 });
 

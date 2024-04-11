@@ -1,11 +1,11 @@
 import type { FC } from "react";
 
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
@@ -30,9 +30,11 @@ const More: FC = (): JSX.Element => {
 		load();
 	}, [load]);
 
-	useEffect(() => {
-		getStorageData();
-	}, []);
+	useFocusEffect(
+		useCallback(() => {
+			getStorageData();
+		}, [])
+	);
 
 	return (
 		<SafeAreaView style={styles.main}>
@@ -69,6 +71,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
+		paddingBottom: 70,
 	},
 	card: {
 		flexDirection: "row",
