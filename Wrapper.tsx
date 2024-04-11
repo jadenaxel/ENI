@@ -8,13 +8,15 @@ const initialValue: any = {
 	Data: "",
 	SeriesItem: "",
 	Links: "",
+	Categories: "",
 };
 
 //  Creating actions names and exporting them
 export const Actions: any = {
 	All: "All",
 	SeriesItem: "Series Item",
-	Links: "",
+	Links: "Links",
+	Categories: "Categories",
 };
 
 // Reducer function
@@ -27,6 +29,8 @@ const reducer = (state: any, action: any): any => {
 			return { ...state, SeriesItem: action.payload };
 		case Actions.Links:
 			return { ...state, Links: action.payload };
+		case Actions.Categories:
+			return { ...state, Categories: action.payload };
 		default:
 			return state;
 	}

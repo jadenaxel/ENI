@@ -42,7 +42,7 @@ const More: FC = (): JSX.Element => {
 				<View style={styles.card}>
 					{allData.map((item: any, i: number) => {
 						return (
-							<Link key={i} href={"/(series)/item"} asChild>
+							<Link key={i} href={"/(content)/item"} asChild>
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: item });
@@ -55,12 +55,12 @@ const More: FC = (): JSX.Element => {
 						);
 					})}
 				</View>
-				{allData.length <= 0 && (
-					<View style={styles.favorite}>
-						<Text style={styles.favoriteText}>No hay favoritos.</Text>
-					</View>
-				)}
 			</ScrollView>
+			{allData.length <= 0 && (
+				<View style={styles.favorite}>
+					<Text style={styles.favoriteText}>No hay favoritos.</Text>
+				</View>
+			)}
 		</SafeAreaView>
 	);
 };
@@ -78,11 +78,11 @@ const styles = StyleSheet.create({
 	},
 	favorite: {
 		alignItems: "center",
-		justifyContent: "center",
 		flex: 1,
 	},
 	favoriteText: {
 		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(17),
 	},
 });
 

@@ -113,7 +113,7 @@ const Item: FC = (): JSX.Element => {
 										{item.chapter &&
 											item.chapter.map((item: any, key: number) => {
 												return (
-													<Link href={"/(series)/chapter"} key={key} style={[styles.chapter, { backgroundColor: chapterColor }]} asChild>
+													<Link href={"/(content)/chapter"} key={key} style={[styles.chapter, { backgroundColor: chapterColor }]} asChild>
 														<Pressable
 															onPress={() => {
 																dispatch({ type: Actions.Links, payload: item });

@@ -26,7 +26,7 @@ const CARD_SECTION = ({ data, title, dispatch, isLoaded, show }: any) => {
 					.slice(0, DATA_SIZE_CONTENT)
 					.map((item: any, i: number) => {
 						return (
-							<Link key={i} href={"/(series)/item"} asChild>
+							<Link key={i} href={"/(content)/item"} asChild>
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: item });

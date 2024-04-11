@@ -9,7 +9,8 @@ const Root: FC = (): JSX.Element => {
 		<Wrapper>
 			<Stack>
 				<Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-				<Stack.Screen name="(series)" options={{ headerShown: false }} />
+				<Stack.Screen name="(content)" options={{ headerShown: false }} />
+				<Stack.Screen name="(search)" options={{ headerShown: false }} />
 			</Stack>
 		</Wrapper>
 	);
