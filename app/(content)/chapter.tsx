@@ -3,8 +3,8 @@ import type { FC } from "react";
 import { useContext } from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-import { Option } from "@/components";
-import { Colors, Sizes } from "@/config";
+import { AdBanner, Option } from "@/components";
+import { Ads, Colors, Sizes } from "@/config";
 import { Context } from "@/Wrapper";
 
 const Chapter: FC = (): JSX.Element => {
@@ -15,6 +15,7 @@ const Chapter: FC = (): JSX.Element => {
 
 	return (
 		<View style={styles.main}>
+			<AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />
 			{note && (
 				<View style={styles.noteContainer}>
 					<Text style={styles.noteTitle}>Nota</Text>

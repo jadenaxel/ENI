@@ -108,9 +108,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		gap: 10,
 	},
-	categories: {
-		marginBottom: 20,
-	},
+	categories: {},
 });
 
 export default Home;

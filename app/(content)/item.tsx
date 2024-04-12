@@ -51,8 +51,8 @@ const Item: FC = (): JSX.Element => {
 
 	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
 
-	const { background, cover, title, description, season, link } = ItemData;
-	const chapterColor: string = background.asset.metadata.palette.darkMuted.background;
+	const { background, backgroundURL, cover, coverURL, title, description, season, link } = ItemData;
+	const chapterColor: string = background?.asset.metadata.palette.darkMuted.background ?? Colors.red;
 
 	const contentType: string = season !== null ? Constants.SERIES : Constants.MOVIES;
 
@@ -77,7 +77,7 @@ const Item: FC = (): JSX.Element => {
 
 	return (
 		<ScrollView showsVerticalScrollIndicator={false} style={styles.main}>
-			<ImageBackground source={{ uri: background.asset.url }} style={styles.background} blurRadius={6}>
+			<ImageBackground source={{ uri: background?.asset.url ?? backgroundURL }} style={styles.background} blurRadius={6}>
 				<View style={styles.header}>
 					<Text numberOfLines={1} style={styles.title}>
 						{title}
@@ -87,7 +87,7 @@ const Item: FC = (): JSX.Element => {
 					</Pressable>
 				</View>
 				<View style={styles.info}>
-					<Image style={styles.cover} source={{ uri: cover.asset.url }} />
+					<Image style={styles.cover} source={{ uri: cover?.asset.url ?? coverURL }} />
 					<View style={styles.detail}>
 						<Text style={styles.description} numberOfLines={6}>
 							{description}

@@ -74,6 +74,7 @@ const styles = StyleSheet.create({
 	},
 	data: {
 		flexDirection: "row",
+		justifyContent: "space-between",
 		columnGap: 10,
 		rowGap: 20,
 		flexWrap: "wrap",
