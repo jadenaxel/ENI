@@ -8,7 +8,7 @@ const Card: FC<any> = (props: any): JSX.Element => {
 
 	return (
 		<View style={styles.main}>
-			<Image source={{ uri: cover?.asset.url ?? coverURL }} style={styles.cardImage} />
+			<Image source={{ uri: coverURL ?? cover?.asset.url }} style={styles.cardImage} />
 			<Text style={styles.cardTitle}>{title}</Text>
 		</View>
 	);

@@ -64,6 +64,11 @@ const Search: FC = (): JSX.Element => {
 						<Text style={styles.searchCancel}>Cancelar</Text>
 					</Pressable>
 				</View>
+				{search.length > 0 && searchData.length <= 0 && (
+					<View style={styles.noresult}>
+						<Text style={styles.noresulttext}>No hay resultados</Text>
+					</View>
+				)}
 				{search.length <= 0 && (
 					<View>
 						<Text style={styles.categoriesTitle}>Descubre</Text>
@@ -143,6 +148,15 @@ const styles = StyleSheet.create({
 	searchCancel: {
 		fontSize: Sizes.ajustFontSize(15),
 		color: Colors.text,
+	},
+	noresult: {
+		alignItems: "center",
+		justifyContent: "center",
+		height: Sizes.windowHeight / 1.4,
+	},
+	noresulttext: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(20),
 	},
 	categoriesTitle: {
 		fontSize: Sizes.ajustFontSize(20),

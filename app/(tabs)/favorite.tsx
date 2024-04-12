@@ -15,9 +15,12 @@ import { Actions, Context } from "@/Wrapper";
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
 
 const More: FC = (): JSX.Element => {
-	const { dispatch }: any = useContext(Context);
+	const { state, dispatch }: any = useContext(Context);
 	const [allData, setAllData] = useState<any>([]);
 	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+
+
+    console.log(state.Data)
 
 	const getStorageData = async (): Promise<void> => {
 		const storageDataSeries = await LocalStorage.getData(Constants.SERIES);
