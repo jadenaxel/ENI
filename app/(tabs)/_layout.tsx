@@ -24,14 +24,14 @@ const Tab: FC = (): JSX.Element => {
 			<Tabs.Screen
 				name="index"
 				options={{
-					title: "Home",
+					title: "Inicio",
 					tabBarIcon: () => <Feather size={20} name="home" color={Colors.text} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="favorite"
 				options={{
-					title: "Favorite",
+					title: "Favorita",
 					tabBarIcon: () => <Feather size={20} name="heart" color={Colors.text} />,
 					unmountOnBlur: true,
 				}}
@@ -39,17 +39,17 @@ const Tab: FC = (): JSX.Element => {
 			<Tabs.Screen
 				name="search"
 				options={{
-					title: "Search",
+					title: "Buscar",
 					tabBarIcon: () => <Feather size={20} name="search" color={Colors.text} />,
 				}}
 			/>
-			{/* <Tabs.Screen
+			<Tabs.Screen
 				name="more"
 				options={{
-					title: "Settings",
+					title: "Ajustes",
 					tabBarIcon: () => <Feather size={20} name="settings" color={Colors.text} />,
 				}}
-			/> */}
+			/>
 		</Tabs>
 	);
 };

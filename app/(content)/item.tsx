@@ -9,13 +9,14 @@ import { Link, router } from "expo-router";
 
 import { Actions, Context } from "@/Wrapper";
 import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
-import { AdBanner, CoverModal, Option, SeasonModal } from "@/components";
+import { AdBanner, CoverModal, Loader, Option, SeasonModal } from "@/components";
 
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
 
 const Item: FC = (): JSX.Element => {
+	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const { state, dispatch }: any = useContext(Context);
 	const ItemData: any = state.SeriesItem;
 
@@ -25,20 +26,21 @@ const Item: FC = (): JSX.Element => {
 	const [heart, setHeart] = useState<boolean>(false);
 	const [selectedSeason, setSelectedSeason] = useState<string>(ItemData.season?.at(-1).title ?? "");
 
-	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-	const { background, backgroundURL, cover, coverURL, title, description, season, link } = ItemData;
-	const chapterColor: string = background?.asset.metadata.palette.darkMuted.background ?? Colors.red;
+	const { background, backgroundURL, cover, coverURL, year, title, description, season, categories, trailer, link } = ItemData;
+	const chapterColor: string = background?.asset.metadata.palette.darkMuted.background ?? Colors.chapter;
 
-	const contentType: string = season !== null ? Constants.SERIES : Constants.MOVIES;
+	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
 	const getStorageData = async (title: string) => {
 		const contentData = await LocalStorage.getData(contentType, title);
 		setHeart(contentData?.length > 0 ? true : false);
+		setIsLoading(false);
 	};
 
 	const handleHeart = async () => {
-		heart ? await LocalStorage.removeData(contentType, ItemData) : await LocalStorage.saveData(contentType, ItemData);
+		heart ? await LocalStorage.removeData(contentType, { title }) : await LocalStorage.saveData(contentType, { title });
 		setHeart((prev: boolean): boolean => !prev);
 	};
 
@@ -48,7 +50,9 @@ const Item: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		load();
-	}, [load]);
+	}, [load, isClosed]);
+
+	if (isLoading) return <Loader />;
 
 	return (
 		<View style={styles.main}>
@@ -56,27 +60,37 @@ const Item: FC = (): JSX.Element => {
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>
-						<View style={styles.header}>
-							<Text numberOfLines={1} style={styles.title}>
-								{title}
-							</Text>
-							<Pressable onPress={() => router.back()}>
-								<Feather name="x" size={25} color={"white"} />
+						<Pressable onPress={() => router.back()} style={styles.goBack}>
+							<Feather name="x" size={25} color={"white"} />
+						</Pressable>
+						<Pressable onPress={() => setModalCoverVisible(true)} style={styles.cover}>
+							<Image style={styles.coverImage} source={{ uri: coverURL ?? cover?.asset.url }} />
+						</Pressable>
+						<Text numberOfLines={1} style={styles.title}>
+							{title}
+						</Text>
+						<Pressable onPress={() => handleHeart()} style={styles.heart}>
+							<Feather name="heart" size={30} color={heart ? "red" : "white"} />
+						</Pressable>
+						<Text style={styles.description} numberOfLines={5}>
+							{description}
+						</Text>
+						<ScrollView contentContainerStyle={styles.ccontent} horizontal showsHorizontalScrollIndicator={false}>
+							{categories.map((category: any, i: number) => {
+								return (
+									<View key={i} style={styles.categories}>
+										<Text style={styles.categoriesText}>{category.title}</Text>
+									</View>
+								);
+							})}
+						</ScrollView>
+						<Text style={styles.year}>Año: {year ?? "-"}</Text>
+						{trailer && (
+							<Pressable style={styles.trailer} onPress={() => Linking.openURL(trailer)}>
+								<Feather name="play" size={20} color={Colors.text} />
+								<Text style={styles.trailerText}>Trailer</Text>
 							</Pressable>
-						</View>
-						<View style={styles.info}>
-							<Pressable style={styles.covermodal} onPress={() => setModalCoverVisible(true)}>
-								<Image style={styles.cover} source={{ uri: coverURL ?? cover?.asset.url }} />
-							</Pressable>
-							<View style={styles.detail}>
-								<Text style={styles.description} numberOfLines={10}>
-									{description}
-								</Text>
-								<Pressable onPress={() => handleHeart()}>
-									<Feather name="heart" size={25} color={heart ? "red" : "white"} style={styles.favorite} />
-								</Pressable>
-							</View>
-						</View>
+						)}
 					</View>
 				</ImageBackground>
 				{season && (
@@ -88,38 +102,37 @@ const Item: FC = (): JSX.Element => {
 						{season
 							.sort((a: any, b: any) => b.title.localeCompare(a.title))
 							.map((item: any, i: number) => {
-								if (selectedSeason === item.title)
-									return (
-										<View key={i}>
-											{item.chapter &&
-												item.chapter.map((item: any, key: number) => {
-													return (
-														<Link
-															href={"/(content)/chapter"}
-															key={key}
-															style={[styles.chapter, { backgroundColor: chapterColor }]}
-															asChild
+								if (selectedSeason !== item.title) return null;
+								return (
+									<View key={i}>
+										{item.chapter &&
+											item.chapter.map((item: any, key: number) => {
+												return (
+													<Link
+														href={"/(content)/chapter"}
+														key={key}
+														style={[styles.chapter, { backgroundColor: chapterColor }]}
+														asChild
+													>
+														<Pressable
+															onPress={() => {
+																dispatch({ type: Actions.Links, payload: item });
+																if (isLoaded) show();
+															}}
 														>
-															<Pressable
-																onPress={() => {
-																	dispatch({ type: Actions.Links, payload: item });
-																	if (isLoaded) show();
-																}}
-															>
-																<Text style={styles.chapterTitle}>{item.title}</Text>
-																<View style={styles.chapterIcons}>
-																	<Feather name="chevron-right" size={25} color={Colors.text} />
-																	<Pressable onPress={() => Linking.openURL(item.link[0])}>
-																		<Feather name="download" size={25} color={Colors.text} />
-																	</Pressable>
-																</View>
-															</Pressable>
-														</Link>
-													);
-												})}
-										</View>
-									);
-								return null;
+															<Text style={styles.chapterTitle}>{item.title}</Text>
+															<View style={styles.chapterIcons}>
+																<Feather name="chevron-right" size={25} color={Colors.text} />
+																<Pressable onPress={() => Linking.openURL(item.link[0])}>
+																	<Feather name="download" size={25} color={Colors.text} />
+																</Pressable>
+															</View>
+														</Pressable>
+													</Link>
+												);
+											})}
+									</View>
+								);
 							})}
 					</View>
 				)}
@@ -155,53 +168,77 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 1,
 		backgroundColor: Colors.background,
-        paddingBottom: 70
+		paddingBottom: 70,
 	},
 	background: {
-		height: Sizes.windowHeight / 2.5,
 		marginBottom: 20,
 	},
 	backgroundColor: {
-		backgroundColor: "rgba(0,0,0,.6)",
 		flex: 1,
-	},
-	header: {
-		flexDirection: "row",
+		backgroundColor: "rgba(0,0,0,.6)",
 		paddingHorizontal: Sizes.paddingHorizontal,
+		paddingBottom: 20,
+	},
+	goBack: {
+		marginTop: 30,
+		marginBottom: 10,
+	},
+	cover: {
 		alignItems: "center",
-		justifyContent: "space-between",
-		marginTop: Sizes.windowHeight / 20,
-		marginBottom: Sizes.windowHeight / 90,
+		marginBottom: 20,
+	},
+	coverImage: {
+		width: Sizes.windowWidth / 3,
+		height: Sizes.windowHeight / 3.5,
+		borderRadius: 4,
 	},
 	title: {
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(20),
-		width: "80%",
+		textAlign: "center",
+		marginBottom: 10,
 	},
-	info: {
-		paddingHorizontal: Sizes.paddingHorizontal,
-		flexDirection: "row",
-		justifyContent: "space-between",
-		gap: 10,
-	},
-	detail: {
-		width: "100%",
-	},
-	covermodal: {
-		width: "35%",
-		height: Sizes.windowHeight / 3.5,
-	},
-	cover: {
-		height: "100%",
-		borderRadius: 4,
+	heart: {
+		alignItems: "center",
+		marginBottom: 10,
 	},
 	description: {
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
-		width: "65%",
+		textAlign: "justify",
 		marginBottom: 10,
 	},
-	favorite: {},
+
+	ccontent: {
+		gap: 10,
+		marginBottom: 10,
+	},
+	categories: {
+		backgroundColor: Colors.chapter,
+		borderRadius: 4,
+		padding: 10,
+	},
+	categoriesText: {
+		color: Colors.text,
+	},
+	year: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(15),
+		marginBottom: 10,
+	},
+	trailer: {
+		backgroundColor: Colors.chapter,
+		height: 40,
+		borderRadius: 6,
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 10,
+		flexDirection: "row",
+	},
+	trailerText: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(16),
+	},
 	season: {
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},

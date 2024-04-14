@@ -11,11 +11,13 @@ const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
 
 	const { Links } = state;
-	const { note } = Links;
+
+	const { note, title } = Links;
 
 	return (
 		<View style={styles.main}>
 			<AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />
+			<Text style={styles.chapter}>Capitulo - {title.split("x")[0]}</Text>
 			{note && (
 				<View style={styles.noteContainer}>
 					<Text style={styles.noteTitle}>Nota</Text>
@@ -35,6 +37,11 @@ const styles = StyleSheet.create({
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
 		paddingTop: 50,
+	},
+	chapter: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(25),
+		marginBottom: 20,
 	},
 	noteContainer: {
 		backgroundColor: Colors.black,

@@ -8,36 +8,49 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useFocusEffect } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
-import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
-import { AdBanner, Card, Title } from "@/components";
+import { Ads, Colors, Constants, LocalStorage, Query, Sizes } from "@/config";
+import { AdBanner, Card, Loader, Title, useFetch } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
 
 const More: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
+	const [loading, setLoading] = useState<boolean>(true);
 	const [allData, setAllData] = useState<any>([]);
-	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
 
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-    console.log(state.Data)
+	const data = state.Data.length > 0 ? state.Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
+	const { series, movie }: any = data;
 
 	const getStorageData = async (): Promise<void> => {
 		const storageDataSeries = await LocalStorage.getData(Constants.SERIES);
 		const storageDataMovies = await LocalStorage.getData(Constants.MOVIES);
 
-		setAllData([...storageDataMovies, ...storageDataSeries]);
+		const Series: any = series?.filter((item: any) => storageDataSeries.some((series: any) => series.title === item.title));
+		const Movie: any = movie?.filter((item: any) => storageDataMovies.some((movie: any) => movie.title === item.title));
+
+		try {
+			setAllData([...Series, ...Movie]);
+		} catch (e: any) {}
 	};
 
 	useEffect(() => {
 		load();
-	}, [load]);
+	}, [load, isClosed]);
+
+	useEffect(() => {
+		if (data.length > 0 || data.hasOwnProperty("movie")) setLoading(false);
+	}, [data]);
 
 	useFocusEffect(
 		useCallback(() => {
 			getStorageData();
-		}, [])
+		}, [data])
 	);
+
+	if (loading) return <Loader />;
 
 	return (
 		<SafeAreaView style={styles.main}>

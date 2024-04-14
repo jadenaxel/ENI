@@ -4,4 +4,6 @@ export default {
 	text: "#fff",
 	Tint: "#0e2",
 	red: "red",
+	chapter: "#008E15",
+	categories: ["#ffc857", "#f49d52", "#e9724c", "#d74d45", "#c5283d", "#872331", "#481d24", "#402e3d", "#373e55", "#255f85"],
 };

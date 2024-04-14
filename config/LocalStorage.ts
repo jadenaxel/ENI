@@ -24,10 +24,14 @@ const saveData = async (type: string, state: any): Promise<void> => {
 	}
 };
 
-const removeData = async (type: string, item: any): Promise<void> => {
+const removeData = async (type: string, item?: any): Promise<void> => {
 	try {
 		const data: any = await AsyncStorage.getItem(type);
 		const parsing = JSON.parse(data);
+		if (!item) {
+			await AsyncStorage.setItem(type, JSON.stringify(""));
+			return;
+		}
 		if (parsing === null) return;
 		const deleteItem = parsing.filter((items: any) => items.title !== item.title);
 		await AsyncStorage.setItem(type, JSON.stringify(deleteItem));

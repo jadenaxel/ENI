@@ -16,7 +16,7 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_
 const Categories: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
 
-	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { state, dispatch }: any = useContext(Context);
 
@@ -36,7 +36,7 @@ const Categories: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		load();
-	}, [load]);
+	}, [load, isClosed]);
 
 	useEffect(() => {
 		loadCategories();

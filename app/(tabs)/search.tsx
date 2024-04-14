@@ -14,10 +14,12 @@ import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
+const CONTENT_TYPE: string[] = ["Anime", "Pelicula", "Serie"];
+
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
 	const [searchData, setSearchData] = useState<any>([]);
-	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { state, dispatch }: any = useContext(Context);
 	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
@@ -33,14 +35,15 @@ const Search: FC = (): JSX.Element => {
 
 		setSearchData([...SeriesFiler, ...MovieFiler]);
 	};
-	const cleanUp = () => {
+
+	const cleanUp = (): void => {
 		setSearch("");
 		setSearchData([]);
 	};
 
 	useEffect(() => {
 		load();
-	}, [load]);
+	}, [load, isClosed]);
 
 	if (isLoading) return <Loader />;
 	if (error[0]) return <Error />;
@@ -71,24 +74,53 @@ const Search: FC = (): JSX.Element => {
 				)}
 				{search.length <= 0 && (
 					<View>
-						<Text style={styles.categoriesTitle}>Descubre</Text>
-						<View style={styles.categories}>
-							{data
-								.sort((a: any, b: any) => a.title.localeCompare(b.title))
-								.map((item: any, i: number) => {
-									return (
-										<Link key={i} href={"/(search)/categories"} asChild>
-											<Pressable
-												onPress={() => {
-													dispatch({ type: Actions.Categories, payload: item });
-													if (isLoaded) show();
-												}}
-											>
-												<CCard title={item.title} />
-											</Pressable>
-										</Link>
-									);
-								})}
+						<View>
+							<Text style={styles.descubreTitle}>Descubre</Text>
+							<View style={styles.descubre}>
+								{data
+									.sort((a: any, b: any) => a.title.localeCompare(b.title))
+									.map((item: any, i: number) => {
+										if (!CONTENT_TYPE.includes(item.title)) return null;
+
+										return (
+											<Link key={i} href={"/(search)/categories"} asChild>
+												<Pressable
+													onPress={() => {
+														dispatch({ type: Actions.Categories, payload: item });
+														if (isLoaded) show();
+													}}
+													style={styles.descubreCard}
+												>
+													<CCard title={item.title} />
+												</Pressable>
+											</Link>
+										);
+									})}
+							</View>
+						</View>
+						<View>
+							<Text style={styles.categoriesTitle}>Categorias</Text>
+							<View style={styles.categories}>
+								{data
+									.sort((a: any, b: any) => a.title.localeCompare(b.title))
+									.map((item: any, i: number) => {
+										if (CONTENT_TYPE.includes(item.title)) return null;
+
+										return (
+											<Link key={i} href={"/(search)/categories"} asChild>
+												<Pressable
+													onPress={() => {
+														dispatch({ type: Actions.Categories, payload: item });
+														if (isLoaded) show();
+													}}
+													style={styles.categoriesCard}
+												>
+													<CCard title={item.title} />
+												</Pressable>
+											</Link>
+										);
+									})}
+							</View>
 						</View>
 					</View>
 				)}
@@ -158,6 +190,20 @@ const styles = StyleSheet.create({
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(20),
 	},
+	descubreTitle: {
+		fontSize: Sizes.ajustFontSize(20),
+		color: Colors.text,
+		marginBottom: 20,
+	},
+	descubre: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		gap: 10,
+		marginBottom: 20,
+	},
+	descubreCard: {
+		flex: 1,
+	},
 	categoriesTitle: {
 		fontSize: Sizes.ajustFontSize(20),
 		color: Colors.text,
@@ -168,6 +214,9 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		justifyContent: "space-between",
 		gap: 10,
+	},
+	categoriesCard: {
+		width: Sizes.windowWidth / 2.3,
 	},
 	searchData: {
 		flexDirection: "row",

@@ -49,7 +49,7 @@ const Home: FC = (): JSX.Element => {
 
 	const { dispatch }: any = useContext(Context);
 
-	const { isLoaded, load, show } = useInterstitialAd(AD_STRING);
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
 	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.All }).data;
@@ -63,7 +63,7 @@ const Home: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		load();
-	}, [load]);
+	}, [load, isClosed]);
 
 	if (error[0]) return <Error />;
 	if (isLoading || loading) return <Loader />;

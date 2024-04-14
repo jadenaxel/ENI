@@ -1,34 +1,61 @@
 import type { FC } from "react";
 
-import { View, Text, StyleSheet, Pressable, Linking } from "react-native";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, Pressable, Linking, Alert } from "react-native";
 
-import { Colors, Sizes } from "@/config";
+import { Ads, Colors, Sizes, Url } from "@/config";
 import { Feather } from "@expo/vector-icons";
 
-const WebSiteName: any = {
-	"grantorrent.wtf": "Gran Torrent",
-	"todotorrents.org": "Todo Torrent",
-	"www.elitetorrent.com": "Elite Torrent",
-	"www.alt-torrent.com": "Alt Torrent",
-	"www.1337xx.to": "1337xx",
-	"www.limetorrents.lol": "Lime Torrent",
-	"idope.se": "Idope",
-	"yts.homes": "YTS",
-	"yts.rs": "YTS",
-	"pelispanda.org": "Pelis Panda",
-	"www.moviesdvdr.co": "Movies DVDR",
-};
+import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import Loader from "./Loader";
+
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
 
 const Option: FC<any> = ({ data }: any): JSX.Element => {
+	const [toGo, setToGo] = useState<string>("");
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
+
+	const OpenLink = async (link: string) => {
+		if (await Linking.canOpenURL(link)) {
+			Linking.openURL(link);
+		} else Alert.alert("Lo siento. Tienes que tener un cliente torrent para abrir este link.");
+		setIsLoading(false);
+	};
+
+	const handleDownload = (item: any, i: number) => {
+		setIsLoading(true);
+		if (i === 0) OpenLink(item);
+		if (isLoaded && i !== 0) {
+			show();
+			setToGo(item);
+		}
+	};
+
+	useEffect(() => {
+		if (isClosed) OpenLink(toGo);
+	}, [toGo, isClosed]);
+
+	useEffect(() => {
+		load();
+	}, [load, isClosed]);
+
+	if (isLoading) return <Loader />;
+
 	return (
 		<View style={styles.optionContainer}>
 			{data.map((item: any, i: number) => {
 				const siteName: string = item.includes("magnet") ? "Magnet" : item.split("/")[2];
 
 				return (
-					<Pressable onPress={() => Linking.openURL(item)} key={i} style={styles.option}>
-						<Text style={styles.optionText}>{WebSiteName[siteName] ?? siteName}</Text>
-						<Feather name="download" size={15} color={Colors.background} />
+					<Pressable
+						onPress={() => handleDownload(item, i)}
+						key={i}
+						style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}
+					>
+						<Text style={[styles.optionText, { color: Url[siteName]?.text ?? Colors.text }]}>{Url[siteName]?.title ?? siteName}</Text>
+						<Feather name="download" size={15} color={Url[siteName]?.text ?? Colors.text} />
 					</Pressable>
 				);
 			})}
@@ -42,7 +69,6 @@ const styles = StyleSheet.create({
 		gap: 10,
 	},
 	option: {
-		backgroundColor: Colors.Tint,
 		padding: 15,
 		borderRadius: 4,
 		flexDirection: "row",
@@ -53,7 +79,6 @@ const styles = StyleSheet.create({
 		width: "100%",
 	},
 	optionText: {
-		color: Colors.background,
 		textTransform: "capitalize",
 		fontSize: Sizes.ajustFontSize(15),
 	},
