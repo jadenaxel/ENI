@@ -1,3 +1,4 @@
 import useFetch from "./useFetch";
+import ColorPicker from "./colorPicker";
 
-export { useFetch };
+export { useFetch, ColorPicker };

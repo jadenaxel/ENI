@@ -9,7 +9,9 @@ const Card: FC<any> = (props: any): JSX.Element => {
 	return (
 		<View style={styles.main}>
 			<Image source={{ uri: coverURL ?? cover?.asset.url }} style={styles.cardImage} />
-			<Text style={styles.cardTitle}>{title}</Text>
+			<Text style={styles.cardTitle} numberOfLines={2}>
+				{title}
+			</Text>
 		</View>
 	);
 };

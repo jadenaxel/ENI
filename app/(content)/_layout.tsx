@@ -2,7 +2,7 @@ import type { FC } from "react";
 
 import { Stack } from "expo-router";
 
-const Tab: FC = (): JSX.Element => {
+const Content: FC = (): JSX.Element => {
 	return (
 		<Stack
 			screenOptions={{
@@ -15,4 +15,4 @@ const Tab: FC = (): JSX.Element => {
 	);
 };
 
-export default Tab;
+export default Content;

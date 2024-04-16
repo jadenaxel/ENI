@@ -7,6 +7,8 @@ import Title from "./Title";
 import CategoriesCard from "./CCard";
 
 import { CoverModal, SeasonModal } from "./Item";
+import { Card_Section } from "./Home";
 
 export { AdBanner, Loader, Error, Card, Option, Title, CategoriesCard };
 export { CoverModal, SeasonModal };
+export { Card_Section };

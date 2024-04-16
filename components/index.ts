@@ -1,11 +1,11 @@
 // UI
-import { AdBanner, Loader, Error, Card, Option, Title, CategoriesCard, CoverModal, SeasonModal } from "./UI";
+import { AdBanner, Loader, Error, Card, Option, Title, CategoriesCard, CoverModal, SeasonModal, Card_Section } from "./UI";
 
 // Utilities
-import { useFetch } from "./Utility";
+import { useFetch, ColorPicker } from "./Utility";
 
 // UI
-export { AdBanner, Loader, Error, Card, Option, Title, CategoriesCard, CoverModal, SeasonModal };
+export { AdBanner, Loader, Error, Card, Option, Title, CategoriesCard, CoverModal, SeasonModal, Card_Section };
 
 // Utilities
-export { useFetch };
+export { useFetch, ColorPicker };

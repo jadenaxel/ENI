@@ -1,11 +1,35 @@
 import type { FC } from "react";
 
-import { Tabs } from "expo-router";
+import { useContext, useState, useEffect } from "react";
 
+import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { Colors, Sizes } from "@/config";
+
+import { Colors, LocalStorage, Sizes } from "@/config";
+import { Actions, Context } from "@/Wrapper";
+import { Loader } from "@/components";
 
 const Tab: FC = (): JSX.Element => {
+	const [loading, setLoading] = useState<boolean>(true);
+	const { state, dispatch }: any = useContext(Context);
+
+	const userColor: string = state.colorOne;
+
+	const LoadColor = async () => {
+		const PrincipalColor = await LocalStorage.getData("PrincipaColor");
+
+		if (PrincipalColor.length > 0 && PrincipalColor !== null) dispatch({ type: Actions.PrincipalColor, payload: PrincipalColor[0] });
+		else dispatch({ type: Actions.PrincipalColor, payload: Colors.Tint });
+
+		setLoading(false);
+	};
+
+	useEffect(() => {
+		LoadColor();
+	}, []);
+
+	if (loading) return <Loader />;
+
 	return (
 		<Tabs
 			screenOptions={{
@@ -15,7 +39,7 @@ const Tab: FC = (): JSX.Element => {
 					borderTopWidth: 0,
 				},
 				tabBarActiveTintColor: Colors.text,
-				tabBarInactiveTintColor: Colors.Tint,
+				tabBarInactiveTintColor: userColor,
 				tabBarLabelStyle: {
 					fontSize: Sizes.ajustFontSize(13),
 				},

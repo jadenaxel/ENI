@@ -18,10 +18,14 @@ const More: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [allData, setAllData] = useState<any>([]);
+	const [appstore, setAppStore] = useState<string>("");
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const data = state.Data.length > 0 ? state.Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
+
+	const CanLoad: boolean = state.BannerAd === "Load";
+
 	const { series, movie }: any = data;
 
 	const getStorageData = async (): Promise<void> => {
@@ -35,6 +39,16 @@ const More: FC = (): JSX.Element => {
 			setAllData([...Series, ...Movie]);
 		} catch (e: any) {}
 	};
+
+	const getLocalData = async () => {
+		const LocalData = await LocalStorage.getData("appstore");
+		const realData = LocalData.length > 0 ? LocalData[0] : state.store;
+		setAppStore(realData);
+	};
+
+	useEffect(() => {
+		getLocalData();
+	}, []);
 
 	useEffect(() => {
 		load();
@@ -53,7 +67,7 @@ const More: FC = (): JSX.Element => {
 	if (loading) return <Loader />;
 
 	return (
-		<SafeAreaView style={styles.main}>
+		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 70 } : null]}>
 			<AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" />
@@ -63,7 +77,7 @@ const More: FC = (): JSX.Element => {
 							<Link key={i} href={"/(content)/item"} asChild>
 								<Pressable
 									onPress={() => {
-										dispatch({ type: Actions.SeriesItem, payload: item });
+										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
 										if (isLoaded) show();
 									}}
 								>
@@ -87,7 +101,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
-		paddingBottom: 70,
 	},
 	card: {
 		flexDirection: "row",

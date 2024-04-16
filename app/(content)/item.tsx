@@ -18,7 +18,9 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME
 const Item: FC = (): JSX.Element => {
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const { state, dispatch }: any = useContext(Context);
-	const ItemData: any = state.SeriesItem;
+
+	const ItemData: any = state.SeriesItem.item;
+	const sensible: string = state.SeriesItem.appstore;
 
 	const [modalSeasonVisible, setModalSeasonVisible] = useState<boolean>(false);
 	const [modalCoverVisible, setModalCoverVisible] = useState<boolean>(false);
@@ -33,10 +35,22 @@ const Item: FC = (): JSX.Element => {
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
+	const done: boolean = sensible === "123show" ? true : false;
+
+	const PrincipalColor: string = state.colorOne;
+	const TextColor: string = state.textColor;
+
 	const getStorageData = async (title: string) => {
 		const contentData = await LocalStorage.getData(contentType, title);
 		setHeart(contentData?.length > 0 ? true : false);
-		setIsLoading(false);
+	};
+
+	const getColor = async () => {
+		const PrincipalColor = await LocalStorage.getData("PrincipaColor");
+		const TextColor = await LocalStorage.getData("TextColor");
+
+		if (PrincipalColor.length > 0 && PrincipalColor !== null) dispatch({ type: Actions.PrincipalColor, payload: PrincipalColor[0] });
+		if (TextColor.length > 0 && TextColor !== null) dispatch({ type: Actions.TextColor, payload: TextColor[0] });
 	};
 
 	const handleHeart = async () => {
@@ -44,8 +58,12 @@ const Item: FC = (): JSX.Element => {
 		setHeart((prev: boolean): boolean => !prev);
 	};
 
+	const REPORT_MOVIE: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Pelicula"&body="La Pelicula ${title} tiene problema"`;
+
 	useEffect(() => {
 		getStorageData(title);
+		getColor();
+		setIsLoading(false);
 	}, []);
 
 	useEffect(() => {
@@ -60,15 +78,10 @@ const Item: FC = (): JSX.Element => {
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>
-						<Pressable onPress={() => router.back()} style={styles.goBack}>
-							<Feather name="x" size={25} color={"white"} />
-						</Pressable>
 						<Pressable onPress={() => setModalCoverVisible(true)} style={styles.cover}>
 							<Image style={styles.coverImage} source={{ uri: coverURL ?? cover?.asset.url }} />
 						</Pressable>
-						<Text numberOfLines={1} style={styles.title}>
-							{title}
-						</Text>
+						<Text style={styles.title}>{title}</Text>
 						<Pressable onPress={() => handleHeart()} style={styles.heart}>
 							<Feather name="heart" size={30} color={heart ? "red" : "white"} />
 						</Pressable>
@@ -78,22 +91,31 @@ const Item: FC = (): JSX.Element => {
 						<ScrollView contentContainerStyle={styles.ccontent} horizontal showsHorizontalScrollIndicator={false}>
 							{categories.map((category: any, i: number) => {
 								return (
-									<View key={i} style={styles.categories}>
-										<Text style={styles.categoriesText}>{category.title}</Text>
-									</View>
+									<Link href={"/(search)/categories"} key={i} asChild>
+										<Pressable
+											onPress={() => {
+												dispatch({ type: Actions.Categories, payload: category });
+												if (isLoaded) show();
+											}}
+										>
+											<View style={[styles.categories, { backgroundColor: PrincipalColor }]}>
+												<Text style={[styles.categoriesText, { color: TextColor }]}>{category.title}</Text>
+											</View>
+										</Pressable>
+									</Link>
 								);
 							})}
 						</ScrollView>
 						<Text style={styles.year}>Año: {year ?? "-"}</Text>
 						{trailer && (
-							<Pressable style={styles.trailer} onPress={() => Linking.openURL(trailer)}>
-								<Feather name="play" size={20} color={Colors.text} />
-								<Text style={styles.trailerText}>Trailer</Text>
+							<Pressable style={[styles.trailer, { backgroundColor: PrincipalColor }]} onPress={() => Linking.openURL(trailer)}>
+								<Feather name="play" size={20} color={TextColor} />
+								<Text style={[styles.trailerText, { color: TextColor }]}>Trailer</Text>
 							</Pressable>
 						)}
 					</View>
 				</ImageBackground>
-				{season && (
+				{season && done && (
 					<View style={styles.season}>
 						<Pressable style={styles.selectSeason} onPress={() => setModalSeasonVisible(true)}>
 							<Text style={styles.selectSeasonTitle}>{selectedSeason}</Text>
@@ -106,25 +128,25 @@ const Item: FC = (): JSX.Element => {
 								return (
 									<View key={i}>
 										{item.chapter &&
-											item.chapter.map((item: any, key: number) => {
+											item.chapter.map((chapter: any, key: number) => {
 												return (
 													<Link
 														href={"/(content)/chapter"}
 														key={key}
-														style={[styles.chapter, { backgroundColor: chapterColor }]}
+														style={[styles.chapter, { backgroundColor: PrincipalColor }]}
 														asChild
 													>
 														<Pressable
 															onPress={() => {
-																dispatch({ type: Actions.Links, payload: item });
+																dispatch({ type: Actions.Links, payload: { chapter, contentTitle: title } });
 																if (isLoaded) show();
 															}}
 														>
-															<Text style={styles.chapterTitle}>{item.title}</Text>
+															<Text style={[styles.chapterTitle, { color: TextColor }]}>{chapter.title}</Text>
 															<View style={styles.chapterIcons}>
-																<Feather name="chevron-right" size={25} color={Colors.text} />
-																<Pressable onPress={() => Linking.openURL(item.link[0])}>
-																	<Feather name="download" size={25} color={Colors.text} />
+																<Feather name="chevron-right" size={25} color={TextColor} />
+																<Pressable onPress={() => Linking.openURL(chapter.link[0])}>
+																	<Feather name="download" size={25} color={TextColor} />
 																</Pressable>
 															</View>
 														</Pressable>
@@ -136,22 +158,26 @@ const Item: FC = (): JSX.Element => {
 							})}
 					</View>
 				)}
-				{season === undefined && (
+				{season === undefined && done && (
 					<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
-						<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieLink, { backgroundColor: chapterColor }]}>
-							<Feather name="download" size={20} color={Colors.text} />
-							<Text style={styles.downloadMovie}>Descargar</Text>
+						<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
+							<Feather name="download" size={20} color={TextColor} />
+							<Text style={[styles.movieButtonText, { color: TextColor }]}>Descargar</Text>
 						</Pressable>
 						{link.length > 1 && (
 							<View>
 								<Text style={styles.moreOption}>Mas Opciones</Text>
-								<Option data={link} />
+								<Option data={link.slice(1)} />
 							</View>
 						)}
+						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
+							<Feather name="mail" size={20} color={TextColor} />
+							<Text style={[styles.movieButtonText, { color: TextColor }]}>Reportar</Text>
+						</Pressable>
 					</View>
 				)}
 				<CoverModal modalCoverVisible={modalCoverVisible} setModalCoverVisible={setModalCoverVisible} image={coverURL ?? cover?.asset.url} />
-				{season && (
+				{season && done && (
 					<SeasonModal
 						modalSeasonVisible={modalSeasonVisible}
 						setModalSeasonVisible={setModalSeasonVisible}
@@ -179,13 +205,10 @@ const styles = StyleSheet.create({
 		paddingHorizontal: Sizes.paddingHorizontal,
 		paddingBottom: 20,
 	},
-	goBack: {
-		marginTop: 30,
-		marginBottom: 10,
-	},
 	cover: {
 		alignItems: "center",
 		marginBottom: 20,
+		marginTop: 60,
 	},
 	coverImage: {
 		width: Sizes.windowWidth / 3,
@@ -219,7 +242,7 @@ const styles = StyleSheet.create({
 		padding: 10,
 	},
 	categoriesText: {
-		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(13),
 	},
 	year: {
 		color: Colors.text,
@@ -227,7 +250,6 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	trailer: {
-		backgroundColor: Colors.chapter,
 		height: 40,
 		borderRadius: 6,
 		justifyContent: "center",
@@ -236,7 +258,6 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 	},
 	trailerText: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(16),
 	},
 	season: {
@@ -264,14 +285,13 @@ const styles = StyleSheet.create({
 		justifyContent: "space-between",
 	},
 	chapterTitle: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
 	},
 	chapterIcons: {
 		flexDirection: "row",
 		columnGap: 10,
 	},
-	movieLink: {
+	movieButton: {
 		borderRadius: 4,
 		padding: 10,
 		flexDirection: "row",
@@ -279,8 +299,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		marginBottom: 10,
 	},
-	downloadMovie: {
-		color: Colors.text,
+	movieButtonText: {
 		marginLeft: 10,
 		fontSize: Sizes.ajustFontSize(15),
 	},

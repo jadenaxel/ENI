@@ -4,8 +4,8 @@ const getData = async (type: string, title?: string): Promise<any> => {
 	try {
 		const data: any = await AsyncStorage.getItem(type);
 		const parsing = JSON.parse(data);
-		if (parsing === null) return [];
-		const getTitle: any = parsing.filter((item: any) => item.title === title);
+		if (parsing === null || parsing.length <= 0) return [];
+		const getTitle: any = parsing?.filter((item: any) => item.title === title);
 		if (title) return getTitle;
 		return parsing;
 	} catch (e: any) {
@@ -17,7 +17,7 @@ const saveData = async (type: string, state: any): Promise<void> => {
 	try {
 		const data: any = await AsyncStorage.getItem(type);
 		const parsing = JSON.parse(data);
-		if (parsing === null) await AsyncStorage.setItem(type, JSON.stringify([state]));
+		if (parsing === null || parsing.length <= 0) await AsyncStorage.setItem(type, JSON.stringify([state]));
 		else await AsyncStorage.setItem(type, JSON.stringify([...parsing, state]));
 	} catch (e: any) {
 		console.log(e.message);
@@ -32,8 +32,8 @@ const removeData = async (type: string, item?: any): Promise<void> => {
 			await AsyncStorage.setItem(type, JSON.stringify(""));
 			return;
 		}
-		if (parsing === null) return;
-		const deleteItem = parsing.filter((items: any) => items.title !== item.title);
+		if (parsing === null || parsing.length <= 0) return;
+		const deleteItem = parsing?.filter((items: any) => items.title !== item.title);
 		await AsyncStorage.setItem(type, JSON.stringify(deleteItem));
 	} catch (e: any) {
 		console.log(e.message);

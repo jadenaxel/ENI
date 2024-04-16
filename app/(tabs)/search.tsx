@@ -9,7 +9,7 @@ import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
-import { Ads, Colors, Query, Sizes } from "@/config";
+import { Ads, Colors, LocalStorage, Query, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
@@ -18,16 +18,26 @@ const CONTENT_TYPE: string[] = ["Anime", "Pelicula", "Serie"];
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
+	const [appstore, setAppStore] = useState<string>("");
 	const [searchData, setSearchData] = useState<any>([]);
+
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { state, dispatch }: any = useContext(Context);
 	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
+
+	const CanLoad: boolean = state.BannerAd === "Load";
+
 	state.Data !== undefined ? useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }) : "";
 
 	const { series, movie } = state.Data;
 
 	const handleSearch = (e: any) => {
+		if (e.length === 0) {
+			cleanUp();
+			return;
+		}
+
 		setSearch(e);
 
 		const SeriesFiler = series.filter((item: any) => item.title.toLowerCase().includes(search.toLowerCase()));
@@ -41,6 +51,16 @@ const Search: FC = (): JSX.Element => {
 		setSearchData([]);
 	};
 
+	const getLocalData = async () => {
+		const LocalData = await LocalStorage.getData("appstore");
+		const realData = LocalData.length > 0 ? LocalData[0] : state.store;
+		setAppStore(realData);
+	};
+
+	useEffect(() => {
+		getLocalData();
+	}, []);
+
 	useEffect(() => {
 		load();
 	}, [load, isClosed]);
@@ -49,7 +69,7 @@ const Search: FC = (): JSX.Element => {
 	if (error[0]) return <Error />;
 
 	return (
-		<SafeAreaView style={styles.main}>
+		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 80 } : { paddingBottom: 20 }]}>
 			<AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
@@ -131,7 +151,7 @@ const Search: FC = (): JSX.Element => {
 								<Link key={i} href={"/(content)/item"} asChild>
 									<Pressable
 										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: item });
+											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
 											if (isLoaded) show();
 										}}
 									>
@@ -150,7 +170,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
-		paddingBottom: 80,
 	},
 	search: {
 		flexDirection: "row",
@@ -171,7 +190,7 @@ const styles = StyleSheet.create({
 		backgroundColor: "rgba(30, 30, 30, .9)",
 	},
 	searchBar: {
-		fontSize: Sizes.ajustFontSize(14),
+		fontSize: Sizes.ajustFontSize(13),
 		color: Colors.text,
 		paddingHorizontal: 10,
 		paddingVertical: 5,

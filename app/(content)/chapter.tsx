@@ -1,7 +1,9 @@
 import type { FC } from "react";
 
 import { useContext } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, Pressable, Linking } from "react-native";
+
+import { Feather } from "@expo/vector-icons";
 
 import { AdBanner, Option } from "@/components";
 import { Ads, Colors, Sizes } from "@/config";
@@ -10,9 +12,15 @@ import { Context } from "@/Wrapper";
 const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
 
+	const PrincipalColor: string = state.colorOne;
+	const TextColor: string = state.textColor;
+
 	const { Links } = state;
 
-	const { note, title } = Links;
+	const { note, title, link } = Links.chapter;
+	const contentTitle = Links.contentTitle;
+
+	const REPORT_SERIES: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Serie"&body="La Serei ${contentTitle} tiene problema. En el capitulo ${title}"`;
 
 	return (
 		<View style={styles.main}>
@@ -26,8 +34,12 @@ const Chapter: FC = (): JSX.Element => {
 			)}
 			<View>
 				<Text style={styles.downloads}>Descargas</Text>
-				<Option data={Links.link} />
+				<Option data={link} />
 			</View>
+			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: PrincipalColor }]}>
+				<Feather name="mail" size={20} color={TextColor} />
+				<Text style={[styles.seriesButtonText, { color: TextColor }]}>Reportar</Text>
+			</Pressable>
 		</View>
 	);
 };
@@ -62,6 +74,18 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(20),
 		color: Colors.text,
 		marginBottom: 20,
+	},
+	seriesButton: {
+		borderRadius: 4,
+		padding: 10,
+		flexDirection: "row",
+		justifyContent: "center",
+		alignItems: "center",
+		marginBottom: 10,
+	},
+	seriesButtonText: {
+		marginLeft: 10,
+		fontSize: Sizes.ajustFontSize(15),
 	},
 });
 
