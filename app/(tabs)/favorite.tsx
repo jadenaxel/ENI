@@ -67,7 +67,7 @@ const More: FC = (): JSX.Element => {
 	if (loading) return <Loader />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 70 } : null]}>
+		<SafeAreaView style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
 			<AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" />

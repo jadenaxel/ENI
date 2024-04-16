@@ -16,6 +16,7 @@ const Chapter: FC = (): JSX.Element => {
 	const TextColor: string = state.textColor;
 
 	const { Links } = state;
+	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const { note, title, link } = Links.chapter;
 	const contentTitle = Links.contentTitle;
@@ -23,7 +24,7 @@ const Chapter: FC = (): JSX.Element => {
 	const REPORT_SERIES: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Serie"&body="La Serei ${contentTitle} tiene problema. En el capitulo ${title}"`;
 
 	return (
-		<View style={styles.main}>
+		<View style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
 			<AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />
 			<Text style={styles.chapter}>Capitulo - {title.split("x")[0]}</Text>
 			{note && (

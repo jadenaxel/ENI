@@ -17,7 +17,7 @@ const More: FC = (): JSX.Element => {
 	const CanLoad: boolean = state.BannerAd === "Load";
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 70 } : null]}>
+		<SafeAreaView style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
 			<AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />
 			<ScrollView>
 				<Title title="Ajustes" />

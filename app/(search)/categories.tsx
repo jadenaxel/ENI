@@ -21,6 +21,8 @@ const Categories: FC = (): JSX.Element => {
 
 	const { state, dispatch }: any = useContext(Context);
 
+	const CanLoad: boolean = state.BannerAd === "Load";
+
 	const categories = state.Categories;
 	const { series, movie } = state.Data;
 
@@ -54,7 +56,7 @@ const Categories: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<View style={styles.main}>
+		<View style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
 			<AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={styles.title}>{categories.title}</Text>
@@ -85,7 +87,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
-		paddingBottom: 70,
 	},
 	title: {
 		fontSize: Sizes.ajustFontSize(25),

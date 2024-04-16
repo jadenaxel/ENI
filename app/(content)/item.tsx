@@ -31,11 +31,11 @@ const Item: FC = (): JSX.Element => {
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { background, backgroundURL, cover, coverURL, year, title, description, season, categories, trailer, link } = ItemData;
-	const chapterColor: string = background?.asset.metadata.palette.darkMuted.background ?? Colors.chapter;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
 	const done: boolean = sensible === "123show" ? true : false;
+	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
@@ -73,7 +73,7 @@ const Item: FC = (): JSX.Element => {
 	if (isLoading) return <Loader />;
 
 	return (
-		<View style={styles.main}>
+		<View style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
 			<AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
@@ -194,7 +194,6 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 1,
 		backgroundColor: Colors.background,
-		paddingBottom: 70,
 	},
 	background: {
 		marginBottom: 20,

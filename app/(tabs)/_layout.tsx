@@ -55,7 +55,7 @@ const Tab: FC = (): JSX.Element => {
 			<Tabs.Screen
 				name="favorite"
 				options={{
-					title: "Favorita",
+					title: "Favoritas",
 					tabBarIcon: () => <Feather size={20} name="heart" color={Colors.text} />,
 					unmountOnBlur: true,
 				}}

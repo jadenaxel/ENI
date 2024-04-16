@@ -9,11 +9,9 @@ import { Colors, Sizes } from "@/config";
 import { Actions } from "@/Wrapper";
 import Card from "../Card";
 
-const DATA_SIZE_CONTENT: number = 10;
-
-const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore }: any): JSX.Element => {
+const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore, DATA_SIZE_CONTENT }: any): JSX.Element => {
 	return (
-		<View>
+		<View style={styles.main}>
 			<Text style={styles.lastSeriesTitle}>{title}</Text>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lastSeriesContent}>
 				{data
@@ -38,6 +36,9 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore 
 	);
 };
 const styles = StyleSheet.create({
+	main: {
+		paddingHorizontal: Sizes.paddingHorizontal,
+	},
 	lastSeriesTitle: {
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
