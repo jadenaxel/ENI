@@ -5,7 +5,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 
 import { Link } from "expo-router";
 
-import { Colors, Sizes } from "@/config";
+import { Colors, Sizes, Constants } from "@/config";
 import { Actions } from "@/Wrapper";
 import Card from "../Card";
 
@@ -23,7 +23,7 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore,
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-										if (isLoaded) show();
+										if (isLoaded && !Constants.IsDev) show();
 									}}
 								>
 									<Card item={item} />

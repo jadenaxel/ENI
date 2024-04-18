@@ -6,7 +6,8 @@ import { Colors } from "./config";
 
 // Initializing values to state
 const initialValue: any = {
-	store: "Jaden Smith",
+	// store: "Jaden Smith",
+	store: "123show",
 	Data: "",
 	SeriesItem: "",
 	Links: "",

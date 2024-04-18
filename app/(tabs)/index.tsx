@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import { Link } from "expo-router";
 
-import { Colors, Ads, Sizes, LocalStorage, Query } from "@/config";
+import { Colors, Ads, Sizes, LocalStorage, Query, Constants } from "@/config";
 import { AdBanner, Loader, useFetch, Error, Card_Section, Title, Home_Slider, Home_Dot } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
@@ -58,14 +58,15 @@ const Home: FC = (): JSX.Element => {
 	if (isLoading && loading) return <Loader />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
-			<AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />
+		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+			{!Constants.IsDev && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" />
 				</View>
 				<FlatList
 					horizontal
+					disableVirtualization
 					pagingEnabled
 					showsHorizontalScrollIndicator={false}
 					snapToAlignment="center"
@@ -74,7 +75,7 @@ const Home: FC = (): JSX.Element => {
 							<Pressable
 								onPress={() => {
 									dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-									if (isLoaded) show();
+									if (isLoaded && !Constants.IsDev) show();
 								}}
 							>
 								<Home_Slider item={item} />

@@ -67,8 +67,8 @@ const More: FC = (): JSX.Element => {
 	if (loading) return <Loader />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
-			<AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />
+		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+			{!Constants.IsDev && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" />
 				<View style={styles.card}>
@@ -78,7 +78,7 @@ const More: FC = (): JSX.Element => {
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-										if (isLoaded) show();
+										if (isLoaded && !Constants.IsDev) show();
 									}}
 								>
 									<Card item={item} key={i} />

@@ -9,12 +9,10 @@ import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
-import { Ads, Colors, LocalStorage, Query, Sizes } from "@/config";
+import { Ads, Colors, LocalStorage, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
-
-const CONTENT_TYPE: string[] = ["Anime", "Pelicula", "Serie"];
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
@@ -70,7 +68,7 @@ const Search: FC = (): JSX.Element => {
 
 	return (
 		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 80 } : { paddingBottom: 20 }]}>
-			<AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />
+			{!Constants.IsDev && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
 					<View style={styles.searchBarContent}>
@@ -100,14 +98,14 @@ const Search: FC = (): JSX.Element => {
 								{data
 									.sort((a: any, b: any) => a.title.localeCompare(b.title))
 									.map((item: any, i: number) => {
-										if (!CONTENT_TYPE.includes(item.title)) return null;
+										if (!Constants.CATEGORIES.includes(item.title)) return null;
 
 										return (
 											<Link key={i} href={"/(search)/categories"} asChild>
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded) show();
+														if (isLoaded && !Constants.IsDev) show();
 													}}
 													style={styles.descubreCard}
 												>
@@ -124,14 +122,14 @@ const Search: FC = (): JSX.Element => {
 								{data
 									.sort((a: any, b: any) => a.title.localeCompare(b.title))
 									.map((item: any, i: number) => {
-										if (CONTENT_TYPE.includes(item.title)) return null;
+										if (Constants.CATEGORIES.includes(item.title)) return null;
 
 										return (
 											<Link key={i} href={"/(search)/categories"} asChild>
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded) show();
+														if (isLoaded && !Constants.IsDev) show();
 													}}
 													style={styles.categoriesCard}
 												>
@@ -152,7 +150,7 @@ const Search: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded) show();
+											if (isLoaded && !Constants.IsDev) show();
 										}}
 									>
 										<Card item={item} />

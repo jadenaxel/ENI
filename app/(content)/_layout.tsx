@@ -4,11 +4,7 @@ import { Stack } from "expo-router";
 
 const Content: FC = (): JSX.Element => {
 	return (
-		<Stack
-			screenOptions={{
-				headerShown: false,
-			}}
-		>
+		<Stack screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="item" />
 			<Stack.Screen name="chapter" />
 		</Stack>

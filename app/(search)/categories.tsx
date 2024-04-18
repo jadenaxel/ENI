@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
-import { Ads, Colors, LocalStorage, Sizes } from "@/config";
+import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Card, AdBanner } from "@/components";
 
@@ -56,8 +56,8 @@ const Categories: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<View style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
-			<AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />
+		<View style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+			{!Constants.IsDev && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={styles.title}>{categories.title}</Text>
 				<View style={styles.data}>
@@ -69,7 +69,7 @@ const Categories: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded) show();
+											if (isLoaded && !Constants.IsDev) show();
 										}}
 									>
 										<Card item={item} />

@@ -60,4 +60,8 @@ export const Url: any = {
 		title: "Media Fire",
 		color: "#0070F0",
 	},
+	"www.yourupload.com": {
+		title: "Your Upload",
+		color: "#337ab7",
+	},
 };

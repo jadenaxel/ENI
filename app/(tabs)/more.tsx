@@ -7,7 +7,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
-import { Ads, Colors, Sizes } from "@/config";
+import { Ads, Colors, Constants, Sizes } from "@/config";
 import { AdBanner, Title } from "@/components";
 import { Context } from "@/Wrapper";
 
@@ -17,16 +17,16 @@ const More: FC = (): JSX.Element => {
 	const CanLoad: boolean = state.BannerAd === "Load";
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && { paddingBottom: 70 }]}>
-			<AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />
+		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+			{!Constants.IsDev && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
 			<ScrollView>
 				<Title title="Ajustes" />
-				<Link href={"/(more)/profile"} asChild style={styles.profile}>
+				{/* <Link href={"/(more)/profile"} asChild style={styles.profile}>
 					<Pressable style={styles.settingList}>
 						<Text style={styles.settingListText}>Perfil</Text>
 						<Feather name="chevron-right" size={20} color={Colors.text} />
 					</Pressable>
-				</Link>
+				</Link> */}
 				<Link href={"/(more)/custom"} asChild>
 					<Pressable style={styles.settingList}>
 						<Text style={styles.settingListText}>Personalización</Text>

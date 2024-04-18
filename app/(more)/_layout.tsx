@@ -9,9 +9,9 @@ const More: FC = (): JSX.Element => {
 				headerShown: false,
 			}}
 		>
-			<Stack.Screen name="profile" />
+			{/* <Stack.Screen name="profile" /> */}
 			<Stack.Screen name="custom" />
-			<Stack.Screen name="app" />
+			{/* <Stack.Screen name="app" /> */}
 		</Stack>
 	);
 };

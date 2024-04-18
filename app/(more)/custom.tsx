@@ -87,7 +87,7 @@ const Custom: FC = (): JSX.Element => {
 					})}
 				</View>
 				<TouchableOpacity style={styles.btn} onPress={SetPrincipaColor}>
-					<Text style={styles.btnText}>Confirm</Text>
+					<Text style={styles.btnText}>Confirmar</Text>
 				</TouchableOpacity>
 			</RBSheet>
 			<RBSheet customStyles={{ container: styles.sheet }} height={Sizes.windowHeight / 2} openDuration={250} ref={Sheet2}>
@@ -108,7 +108,7 @@ const Custom: FC = (): JSX.Element => {
 					})}
 				</View>
 				<TouchableOpacity style={styles.btn} onPress={SetTextColor}>
-					<Text style={styles.btnText}>Confirm</Text>
+					<Text style={styles.btnText}>Confirmar</Text>
 				</TouchableOpacity>
 			</RBSheet>
 		</View>
