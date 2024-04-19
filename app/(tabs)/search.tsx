@@ -1,7 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useState, useContext, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, TextInput, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, useColorScheme } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
@@ -25,6 +26,9 @@ const Search: FC = (): JSX.Element => {
 	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
 
 	const CanLoad: boolean = state.BannerAd === "Load";
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	state.Data !== undefined ? useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }) : "";
 
@@ -63,37 +67,51 @@ const Search: FC = (): JSX.Element => {
 		load();
 	}, [load, isClosed]);
 
-	if (isLoading) return <Loader />;
-	if (error[0]) return <Error />;
+	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+	if (error[0]) return <Error deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad ? { paddingBottom: 80 } : { paddingBottom: 20 }]}>
+		<SafeAreaView
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 80 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
-					<View style={styles.searchBarContent}>
-						<Feather name="search" size={20} color={Colors.text} />
+					<View
+						style={[
+							styles.searchBarContent,
+							{
+								borderColor: Constants.ColorTypeTwo("background", deviceColor, DarkModeType),
+								backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType),
+							},
+						]}
+					>
+						<Feather name="search" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
 						<TextInput
 							placeholder="Busca peliculas, series, animes, etc..."
-							style={styles.searchBar}
-							placeholderTextColor={Colors.text}
+							style={[styles.searchBar, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}
+							placeholderTextColor={Constants.ColorType("text", deviceColor, DarkModeType)}
 							onChangeText={handleSearch}
 							defaultValue={search}
 						/>
 					</View>
 					<Pressable onPress={cleanUp}>
-						<Text style={styles.searchCancel}>Cancelar</Text>
+						<Text style={[styles.searchCancel, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Cancelar</Text>
 					</Pressable>
 				</View>
 				{search.length > 0 && searchData.length <= 0 && (
 					<View style={styles.noresult}>
-						<Text style={styles.noresulttext}>No hay resultados</Text>
+						<Text style={[styles.noresulttext, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>No hay resultados</Text>
 					</View>
 				)}
 				{search.length <= 0 && (
 					<View>
 						<View>
-							<Text style={styles.descubreTitle}>Descubre</Text>
+							<Text style={[styles.descubreTitle, , { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descubre</Text>
 							<View style={styles.descubre}>
 								{data
 									.sort((a: any, b: any) => a.title.localeCompare(b.title))
@@ -109,7 +127,7 @@ const Search: FC = (): JSX.Element => {
 													}}
 													style={styles.descubreCard}
 												>
-													<CCard title={item.title} />
+													<CCard title={item.title} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 												</Pressable>
 											</Link>
 										);
@@ -117,7 +135,7 @@ const Search: FC = (): JSX.Element => {
 							</View>
 						</View>
 						<View>
-							<Text style={styles.categoriesTitle}>Categorias</Text>
+							<Text style={[styles.categoriesTitle, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Categorias</Text>
 							<View style={styles.categories}>
 								{data
 									.sort((a: any, b: any) => a.title.localeCompare(b.title))
@@ -133,7 +151,7 @@ const Search: FC = (): JSX.Element => {
 													}}
 													style={styles.categoriesCard}
 												>
-													<CCard title={item.title} />
+													<CCard title={item.title} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 												</Pressable>
 											</Link>
 										);
@@ -153,7 +171,7 @@ const Search: FC = (): JSX.Element => {
 											if (isLoaded && !Constants.IsDev) show();
 										}}
 									>
-										<Card item={item} />
+										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 									</Pressable>
 								</Link>
 							);
@@ -166,7 +184,6 @@ const Search: FC = (): JSX.Element => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	search: {
@@ -180,23 +197,19 @@ const styles = StyleSheet.create({
 	searchBarContent: {
 		alignItems: "center",
 		flexDirection: "row",
-		borderColor: Colors.text,
 		borderWidth: 1,
 		borderRadius: 6,
 		flex: 1,
 		paddingHorizontal: 10,
-		backgroundColor: "rgba(30, 30, 30, .9)",
 	},
 	searchBar: {
 		fontSize: Sizes.ajustFontSize(13),
-		color: Colors.text,
 		paddingHorizontal: 10,
 		paddingVertical: 5,
 		flex: 1,
 	},
 	searchCancel: {
 		fontSize: Sizes.ajustFontSize(15),
-		color: Colors.text,
 	},
 	noresult: {
 		alignItems: "center",
@@ -204,12 +217,10 @@ const styles = StyleSheet.create({
 		height: Sizes.windowHeight / 1.4,
 	},
 	noresulttext: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(20),
 	},
 	descubreTitle: {
 		fontSize: Sizes.ajustFontSize(20),
-		color: Colors.text,
 		marginBottom: 20,
 	},
 	descubre: {
@@ -231,6 +242,7 @@ const styles = StyleSheet.create({
 		flexWrap: "wrap",
 		justifyContent: "space-between",
 		gap: 10,
+		marginBottom: 20,
 	},
 	categoriesCard: {
 		width: Sizes.windowWidth / 2.3,
@@ -239,6 +251,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		gap: 10,
 		flexWrap: "wrap",
+		marginBottom: 20,
 	},
 });
 

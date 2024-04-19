@@ -1,7 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useCallback, useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
+import { View, Text, StyleSheet, ScrollView, Pressable, useColorScheme } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -23,6 +24,10 @@ const More: FC = (): JSX.Element => {
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const data = state.Data.length > 0 ? state.Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
+
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	const CanLoad: boolean = state.BannerAd === "Load";
 
@@ -64,13 +69,19 @@ const More: FC = (): JSX.Element => {
 		}, [data])
 	);
 
-	if (loading) return <Loader />;
+	if (loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+		<SafeAreaView
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<Title title="Favoritas" />
+				<Title title="Favoritas" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				<View style={styles.card}>
 					{allData.map((item: any, i: number) => {
 						return (
@@ -81,7 +92,7 @@ const More: FC = (): JSX.Element => {
 										if (isLoaded && !Constants.IsDev) show();
 									}}
 								>
-									<Card item={item} key={i} />
+									<Card deviceColor={deviceColor} DarkModeType={DarkModeType} item={item} key={i} />
 								</Pressable>
 							</Link>
 						);
@@ -90,7 +101,7 @@ const More: FC = (): JSX.Element => {
 			</ScrollView>
 			{allData.length <= 0 && (
 				<View style={styles.favorite}>
-					<Text style={styles.favoriteText}>No hay favoritos.</Text>
+					<Text style={[styles.favoriteText, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>No hay favoritos.</Text>
 				</View>
 			)}
 		</SafeAreaView>
@@ -99,7 +110,6 @@ const More: FC = (): JSX.Element => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	card: {
@@ -113,7 +123,6 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	favoriteText: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(17),
 	},
 });

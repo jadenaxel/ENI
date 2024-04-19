@@ -1,7 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Linking } from "react-native";
+import { View, Text, StyleSheet, Pressable, Linking, useColorScheme } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { WebView } from "react-native-webview";
@@ -21,6 +22,10 @@ const Chapter: FC = (): JSX.Element => {
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
 
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
 	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const contentTitle = Links.contentTitle;
@@ -28,9 +33,15 @@ const Chapter: FC = (): JSX.Element => {
 	const REPORT_SERIES: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Serie"&body="La Serei ${contentTitle} tiene problema. En el capitulo ${title}"`;
 
 	return (
-		<View style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+		<View
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
-			<Text style={styles.chapter}>{title}</Text>
+			<Text style={[styles.chapter, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			{watchOption.length > 0 && (
 				<View>
 					<View style={styles.webVideo}>
@@ -55,12 +66,12 @@ const Chapter: FC = (): JSX.Element => {
 			)}
 			{note && (
 				<View style={styles.noteContainer}>
-					<Text style={styles.noteTitle}>Nota</Text>
+					<Text style={[styles.noteTitle]}>Nota</Text>
 					<Text style={styles.noteContent}>{note}</Text>
 				</View>
 			)}
 			<View>
-				<Text style={styles.downloads}>Descargas</Text>
+				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
 				<Option data={link} />
 			</View>
 			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: PrincipalColor }]}>
@@ -78,7 +89,6 @@ const styles = StyleSheet.create({
 		paddingTop: 50,
 	},
 	chapter: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(25),
 		marginBottom: 20,
 	},
@@ -98,27 +108,22 @@ const styles = StyleSheet.create({
 		borderRadius: 4,
 	},
 	optionWatchText: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
 	},
 	noteContainer: {
-		backgroundColor: Colors.black,
 		borderRadius: 4,
 		padding: 20,
 		marginBottom: 20,
 	},
 	noteTitle: {
 		fontSize: Sizes.ajustFontSize(20),
-		color: Colors.text,
 		marginBottom: 20,
 	},
 	noteContent: {
 		fontSize: Sizes.ajustFontSize(15),
-		color: Colors.text,
 	},
 	downloads: {
 		fontSize: Sizes.ajustFontSize(20),
-		color: Colors.text,
 		marginBottom: 20,
 	},
 	seriesButton: {

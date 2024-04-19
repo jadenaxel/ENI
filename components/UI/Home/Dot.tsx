@@ -2,9 +2,9 @@ import type { FC } from "react";
 
 import { View, StyleSheet, Animated } from "react-native";
 
-import { Colors, Sizes } from "@/config";
+import { Constants, Sizes } from "@/config";
 
-const Dot: FC<any> = ({ data, scrollX, PrincipalColor }: any): JSX.Element => {
+const Dot: FC<any> = ({ data, scrollX, deviceColor, DarkModeType, PrincipalColor }: any): JSX.Element => {
 	return (
 		<View style={styles.container}>
 			{data.map((_: any, idx: any) => {
@@ -18,7 +18,11 @@ const Dot: FC<any> = ({ data, scrollX, PrincipalColor }: any): JSX.Element => {
 
 				const backgroundColor = scrollX.interpolate({
 					inputRange,
-					outputRange: [Colors.text, PrincipalColor, Colors.text],
+					outputRange: [
+						Constants.ColorTypeTwo("background", deviceColor, DarkModeType),
+						PrincipalColor,
+						Constants.ColorTypeTwo("background", deviceColor, DarkModeType),
+					],
 					extrapolate: "clamp",
 				});
 

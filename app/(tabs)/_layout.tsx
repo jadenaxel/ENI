@@ -1,11 +1,13 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext, useState, useEffect } from "react";
+import { useColorScheme } from "react-native";
 
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 
-import { Colors, LocalStorage, Sizes } from "@/config";
+import { Colors, Constants, LocalStorage, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Loader } from "@/components";
 
@@ -13,32 +15,27 @@ const Tab: FC = (): JSX.Element => {
 	const [loading, setLoading] = useState<boolean>(true);
 	const { state, dispatch }: any = useContext(Context);
 
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
 	const userColor: string = state.colorOne;
 
-	const LoadColor = async () => {
-		const PrincipalColor = await LocalStorage.getData("PrincipaColor");
-
-		if (PrincipalColor.length > 0 && PrincipalColor !== null) dispatch({ type: Actions.PrincipalColor, payload: PrincipalColor[0] });
-		else dispatch({ type: Actions.PrincipalColor, payload: Colors.Tint });
-
-		setLoading(false);
-	};
-
 	useEffect(() => {
-		LoadColor();
+		Constants.LoadColor(setLoading, dispatch, Actions);
 	}, []);
 
-	if (loading) return <Loader />;
+	if (loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
 		<Tabs
 			screenOptions={{
 				headerShown: false,
 				tabBarStyle: {
-					backgroundColor: Colors.background,
+					backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType),
 					borderTopWidth: 0,
 				},
-				tabBarActiveTintColor: Colors.text,
+				tabBarActiveTintColor: Constants.ColorType("text", deviceColor, DarkModeType),
 				tabBarInactiveTintColor: userColor,
 				tabBarLabelStyle: {
 					fontSize: Sizes.ajustFontSize(13),
@@ -49,14 +46,14 @@ const Tab: FC = (): JSX.Element => {
 				name="index"
 				options={{
 					title: "Inicio",
-					tabBarIcon: () => <Feather size={20} name="home" color={Colors.text} />,
+					tabBarIcon: () => <Feather size={20} name="home" color={Constants.ColorType("text", deviceColor, DarkModeType)} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="favorite"
 				options={{
 					title: "Favoritas",
-					tabBarIcon: () => <Feather size={20} name="heart" color={Colors.text} />,
+					tabBarIcon: () => <Feather size={20} name="heart" color={Constants.ColorType("text", deviceColor, DarkModeType)} />,
 					unmountOnBlur: true,
 				}}
 			/>
@@ -64,14 +61,14 @@ const Tab: FC = (): JSX.Element => {
 				name="search"
 				options={{
 					title: "Buscar",
-					tabBarIcon: () => <Feather size={20} name="search" color={Colors.text} />,
+					tabBarIcon: () => <Feather size={20} name="search" color={Constants.ColorType("text", deviceColor, DarkModeType)} />,
 				}}
 			/>
 			<Tabs.Screen
 				name="more"
 				options={{
 					title: "Ajustes",
-					tabBarIcon: () => <Feather size={20} name="settings" color={Colors.text} />,
+					tabBarIcon: () => <Feather size={20} name="settings" color={Constants.ColorType("text", deviceColor, DarkModeType)} />,
 				}}
 			/>
 		</Tabs>

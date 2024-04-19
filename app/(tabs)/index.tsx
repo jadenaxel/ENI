@@ -1,7 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext, useEffect, useState, useRef } from "react";
-import { Animated, StyleSheet, ScrollView, View, FlatList, Pressable } from "react-native";
+import { Animated, StyleSheet, ScrollView, View, FlatList, Pressable, useColorScheme } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
@@ -27,6 +28,10 @@ const Home: FC = (): JSX.Element => {
 	const Categories: any = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.All }).data;
 
 	const scrollX: any = useRef(new Animated.Value(0)).current;
+
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	const PrincipalColor: string = state.colorOne;
 	const CanLoad: boolean = state.BannerAd === "Load";
@@ -54,15 +59,21 @@ const Home: FC = (): JSX.Element => {
 		load();
 	}, [load, isClosed]);
 
-	if (error[0]) return <Error />;
-	if (isLoading && loading) return <Loader />;
+	if (error[0]) return <Error deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+	if (isLoading && loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+		<SafeAreaView
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
-					<Title title="Inicio" />
+					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				</View>
 				<FlatList
 					horizontal
@@ -86,7 +97,13 @@ const Home: FC = (): JSX.Element => {
 					keyExtractor={(e) => e.title}
 					onScroll={handleOnScroll}
 				/>
-				<Home_Dot data={allData.slice(0, DATA_SIZE_CONTENT)} scrollX={scrollX} PrincipalColor={PrincipalColor} />
+				<Home_Dot
+					data={allData.slice(0, DATA_SIZE_CONTENT)}
+					scrollX={scrollX}
+					deviceColor={deviceColor}
+					DarkModeType={DarkModeType}
+					PrincipalColor={PrincipalColor}
+				/>
 				{Categories.sort((a: any, b: any) => a.title.localeCompare(b.title)).map((item: any, i: number) => {
 					const content: any = allData.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
 
@@ -102,6 +119,8 @@ const Home: FC = (): JSX.Element => {
 							show={show}
 							appstore={appstore}
 							DATA_SIZE_CONTENT={DATA_SIZE_CONTENT}
+							deviceColor={deviceColor}
+							DarkModeType={DarkModeType}
 						/>
 					);
 				})}

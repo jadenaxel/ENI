@@ -1,8 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext, useEffect, useState, useRef } from "react";
-
-import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, useColorScheme } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -41,17 +41,13 @@ const Item: FC = (): JSX.Element => {
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
 
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
 	const getStorageData = async (title: string) => {
 		const contentData = await LocalStorage.getData(contentType, title);
 		setHeart(contentData?.length > 0 ? true : false);
-	};
-
-	const getColor = async () => {
-		const PrincipalColor = await LocalStorage.getData("PrincipaColor");
-		const TextColor = await LocalStorage.getData("TextColor");
-
-		if (PrincipalColor.length > 0 && PrincipalColor !== null) dispatch({ type: Actions.PrincipalColor, payload: PrincipalColor[0] });
-		if (TextColor.length > 0 && TextColor !== null) dispatch({ type: Actions.TextColor, payload: TextColor[0] });
 	};
 
 	const handleHeart = async () => {
@@ -63,7 +59,6 @@ const Item: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		getStorageData(title);
-		getColor();
 		setIsLoading(false);
 	}, []);
 
@@ -71,10 +66,16 @@ const Item: FC = (): JSX.Element => {
 		load();
 	}, [load, isClosed]);
 
-	if (isLoading) return <Loader />;
+	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<View style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+		<View
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
@@ -122,11 +123,11 @@ const Item: FC = (): JSX.Element => {
 					<View style={styles.season}>
 						<View style={styles.seasonOption}>
 							<Pressable style={styles.selectSeason} onPress={() => setModalSeasonVisible(true)}>
-								<Text style={styles.text}>{selectedSeason}</Text>
-								<Feather name="chevron-down" size={20} color={Colors.text} />
+								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{selectedSeason}</Text>
+								<Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
 							</Pressable>
 							<Pressable onPress={() => sortOrder.current.open()}>
-								<Text style={styles.text}>Ordenar</Text>
+								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Ordenar</Text>
 							</Pressable>
 						</View>
 						{season

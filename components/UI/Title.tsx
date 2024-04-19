@@ -1,16 +1,15 @@
 import type { FC } from "react";
 
-import { View, Text, StyleSheet } from "react-native";
+import { Text, StyleSheet } from "react-native";
 
-import { Colors, Sizes } from "@/config";
+import { Constants, Sizes } from "@/config";
 
-const Title: FC<any> = ({ title }: { title: string }): JSX.Element => {
-	return <Text style={styles.title}>{title}</Text>;
+const Title: FC<any> = ({ title, deviceColor, DarkModeType }: any): JSX.Element => {
+	return <Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>;
 };
 const styles = StyleSheet.create({
 	title: {
 		fontSize: Sizes.ajustFontSize(30),
-		color: Colors.text,
 		textTransform: "uppercase",
 	},
 });

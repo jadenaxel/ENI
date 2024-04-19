@@ -13,6 +13,9 @@ const initialValue: any = {
 	Links: "",
 	Categories: "",
 	BannerAd: "Load",
+
+	darkMode: "auto",
+
 	colorOne: Colors.Tint,
 	textColor: Colors.text,
 };
@@ -25,6 +28,9 @@ export const Actions: any = {
 	Links: "Links",
 	Categories: "Categories",
 	BannerAd: "BannerAd",
+
+	DarkMode: "Dark Mode",
+
 	PrincipalColor: "Principal Color",
 	TextColor: "Text Color",
 };
@@ -45,6 +51,10 @@ const reducer = (state: any, action: any): any => {
 			return { ...state, Categories: action.payload };
 		case Actions.BannerAd:
 			return { ...state, BannerAd: action.payload };
+
+		case Actions.DarkMode:
+			return { ...state, darkMode: action.payload };
+
 		case Actions.PrincipalColor:
 			return { ...state, colorOne: action.payload };
 		case Actions.TextColor:

@@ -9,10 +9,10 @@ import { Colors, Sizes, Constants } from "@/config";
 import { Actions } from "@/Wrapper";
 import Card from "../Card";
 
-const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore, DATA_SIZE_CONTENT }: any): JSX.Element => {
+const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore, DATA_SIZE_CONTENT, deviceColor, DarkModeType }: any): JSX.Element => {
 	return (
 		<View style={styles.main}>
-			<Text style={styles.lastSeriesTitle}>{title}</Text>
+			<Text style={[styles.lastSeriesTitle, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			<ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.lastSeriesContent}>
 				{data
 					.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
@@ -26,7 +26,7 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore,
 										if (isLoaded && !Constants.IsDev) show();
 									}}
 								>
-									<Card item={item} />
+									<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 								</Pressable>
 							</Link>
 						);
@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	lastSeriesTitle: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
 		marginVertical: 20,
 		textTransform: "uppercase",

@@ -1,9 +1,10 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext } from "react";
-import { Text, StyleSheet, ScrollView, Pressable, Linking } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme } from "react-native";
 
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
@@ -16,11 +17,21 @@ const More: FC = (): JSX.Element => {
 
 	const CanLoad: boolean = state.BannerAd === "Load";
 
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
 	return (
-		<SafeAreaView style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
+		<SafeAreaView
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
 			{!Constants.IsDev && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
 			<ScrollView>
-				<Title title="Ajustes" />
+				<Title title="Ajustes" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				{/* <Link href={"/(more)/profile"} asChild style={styles.profile}>
 					<Pressable style={styles.settingList}>
 						<Text style={styles.settingListText}>Perfil</Text>
@@ -28,9 +39,11 @@ const More: FC = (): JSX.Element => {
 					</Pressable>
 				</Link> */}
 				<Link href={"/(more)/custom"} asChild>
-					<Pressable style={styles.settingList}>
-						<Text style={styles.settingListText}>Personalización</Text>
-						<Feather name="chevron-right" size={20} color={Colors.text} />
+					<Pressable>
+						<View style={[styles.settingList, { borderBottomColor: Constants.ColorType("text", deviceColor, DarkModeType) }]}>
+							<Text style={[styles.settingListText, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Personalización</Text>
+							<Feather name="chevron-right" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
+						</View>
 					</Pressable>
 				</Link>
 				{/* <Pressable style={styles.settingList}>
@@ -49,7 +62,6 @@ const More: FC = (): JSX.Element => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: Colors.background,
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	telegram: {
@@ -73,12 +85,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 
 		paddingVertical: 10,
-
-		borderColor: Colors.text,
 		borderBottomWidth: 1,
 	},
 	settingListText: {
-		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(16),
 	},
 });
