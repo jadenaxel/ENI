@@ -7,7 +7,7 @@ import { useColorScheme } from "react-native";
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 
-import { Colors, Constants, LocalStorage, Sizes } from "@/config";
+import { Constants, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Loader } from "@/components";
 

@@ -6,11 +6,11 @@ import { View, Text, StyleSheet, Image } from "react-native";
 import { Colors, Sizes } from "@/config";
 
 const Slider: FC<any> = (props: any): JSX.Element => {
-	const { title, backgroundURL }: any = props.item;
+	const { title, background, backgroundURL }: any = props.item;
 
 	return (
 		<View style={styles.main}>
-			<Image source={{ uri: backgroundURL }} style={styles.image} resizeMode="cover" borderRadius={10} />
+			<Image source={{ uri: background ?? backgroundURL }} style={styles.image} resizeMode="cover" borderRadius={10} />
 			<View style={styles.cover}>
 				<Text style={styles.text}>{title}</Text>
 			</View>
@@ -38,6 +38,8 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 	},
 	text: {
+		width: "90%",
+		textAlign: "center",
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(15),
 	},
