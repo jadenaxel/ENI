@@ -12,7 +12,10 @@ import { Colors, Ads, Sizes, LocalStorage, Query, Constants } from "@/config";
 import { AdBanner, Loader, useFetch, Error, Card_Section, Title, Home_Slider, Home_Dot } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string =
+	//  __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+
 const DATA_SIZE_CONTENT: number = 10;
 
 const Home: FC = (): JSX.Element => {
@@ -67,10 +70,10 @@ const Home: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
@@ -86,7 +89,7 @@ const Home: FC = (): JSX.Element => {
 							<Pressable
 								onPress={() => {
 									dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-									if (isLoaded && !Constants.IsDev) show();
+									if (isLoaded && Constants.IsDev) show();
 								}}
 							>
 								<Home_Slider item={item} />

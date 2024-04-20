@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
 import { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Linking, Alert, FlatList } from "react-native";
+import { Text, StyleSheet, Pressable, Linking, Alert, FlatList, Image } from "react-native";
 
 import { Ads, Colors, Sizes, Url } from "@/config";
 import { Feather } from "@expo/vector-icons";
@@ -9,15 +9,22 @@ import { Feather } from "@expo/vector-icons";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import Loader from "./Loader";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string =
+	// __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
 
 const Item: FC<any> = ({ item, handleDownload }: any): JSX.Element => {
-	const siteName: string = item.item.includes("magnet") ? "Magnet" : item.item.split("/")[2];
+	const typeOfLink = item.item.hasOwnProperty("link") ? item.item.link : item.item;
+	const siteName: string = typeOfLink.includes("magnet") ? "Magnet" : typeOfLink.split("/")[2];
 
 	return (
 		<Pressable onPress={() => handleDownload(item.item, item.index)} style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}>
 			<Text style={[styles.optionText, { color: Url[siteName]?.text ?? Colors.text }]}>{Url[siteName]?.title ?? siteName}</Text>
 			<Feather name="download" size={15} color={Url[siteName]?.text ?? Colors.text} />
+			{item.item.lang &&
+				item.item.lang?.map((langs: any, i: number) => {
+					return <Image source={{ uri: langs.asset.url }} key={i} style={styles.flags} />;
+				})}
 		</Pressable>
 	);
 };
@@ -76,6 +83,8 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",
+		alignSelf: "center",
+		flexWrap: "wrap",
 
 		gap: 5,
 
@@ -84,6 +93,10 @@ const styles = StyleSheet.create({
 	optionText: {
 		textTransform: "capitalize",
 		fontSize: Sizes.ajustFontSize(15),
+	},
+	flags: {
+		width: 20,
+		height: 20,
 	},
 });
 

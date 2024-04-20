@@ -13,7 +13,9 @@ import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from
 import { Ads, Colors, LocalStorage, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string =
+	//  __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
@@ -75,10 +77,10 @@ const Search: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 80 },
+				CanLoad && Constants.IsDev && { paddingBottom: 80 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
 					<View
@@ -123,7 +125,7 @@ const Search: FC = (): JSX.Element => {
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded && !Constants.IsDev) show();
+														if (isLoaded && Constants.IsDev) show();
 													}}
 													style={styles.descubreCard}
 												>
@@ -147,7 +149,7 @@ const Search: FC = (): JSX.Element => {
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded && !Constants.IsDev) show();
+														if (isLoaded && Constants.IsDev) show();
 													}}
 													style={styles.categoriesCard}
 												>
@@ -168,7 +170,7 @@ const Search: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded && !Constants.IsDev) show();
+											if (isLoaded && Constants.IsDev) show();
 										}}
 									>
 										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />

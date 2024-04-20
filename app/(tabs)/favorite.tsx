@@ -13,7 +13,9 @@ import { Ads, Colors, Constants, LocalStorage, Query, Sizes } from "@/config";
 import { AdBanner, Card, Loader, Title, useFetch } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string =
+	//  __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
 
 const More: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
@@ -76,10 +78,10 @@ const More: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				<View style={styles.card}>
@@ -89,7 +91,7 @@ const More: FC = (): JSX.Element => {
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-										if (isLoaded && !Constants.IsDev) show();
+										if (isLoaded && Constants.IsDev) show();
 									}}
 								>
 									<Card deviceColor={deviceColor} DarkModeType={DarkModeType} item={item} key={i} />

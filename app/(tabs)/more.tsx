@@ -26,10 +26,10 @@ const More: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
 			<ScrollView>
 				<Title title="Ajustes" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				{/* <Link href={"/(more)/profile"} asChild style={styles.profile}>

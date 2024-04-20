@@ -11,7 +11,9 @@ import { Actions, Context } from "@/Wrapper";
 const AdBanner: FC<any> = ({ ID }: { ID: string }): JSX.Element => {
 	const { dispatch }: any = useContext(Context);
 
-	const AD: string = __DEV__ ? TestIds.ADAPTIVE_BANNER : ID;
+	const AD: string =
+		// __DEV__ ? TestIds.ADAPTIVE_BANNER :
+		ID;
 
 	const CantLoad = () => dispatch({ type: Actions.BannerAd, payload: "Can't Load" });
 

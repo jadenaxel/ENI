@@ -1,8 +1,8 @@
 import type { FC } from "react";
+import type { ColorSchemeName } from "react-native";
 
 import { useContext, useState, useEffect } from "react";
-
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Pressable, ScrollView, useColorScheme, SafeAreaView } from "react-native";
 
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
@@ -11,7 +11,9 @@ import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Card, AdBanner } from "@/components";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string =
+	//  __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Categories: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
@@ -22,6 +24,9 @@ const Categories: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 
 	const CanLoad: boolean = state.BannerAd === "Load";
+	const deviceColor: ColorSchemeName = useColorScheme();
+	const DarkMode: string = state.darkMode;
+	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	const categories = state.Categories;
 	const { series, movie } = state.Data;
@@ -56,10 +61,16 @@ const Categories: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<View style={[styles.main, CanLoad && !Constants.IsDev && { paddingBottom: 70 }]}>
-			{!Constants.IsDev && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
+		<SafeAreaView
+			style={[
+				styles.main,
+				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
+			]}
+		>
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<Text style={styles.title}>{categories.title}</Text>
+				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{categories.title}</Text>
 				<View style={styles.data}>
 					{allData
 						.sort((a: any, b: any) => a.title.localeCompare(b.title))
@@ -69,17 +80,17 @@ const Categories: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded && !Constants.IsDev) show();
+											if (isLoaded && Constants.IsDev) show();
 										}}
 									>
-										<Card item={item} />
+										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 									</Pressable>
 								</Link>
 							);
 						})}
 				</View>
 			</ScrollView>
-		</View>
+		</SafeAreaView>
 	);
 };
 const styles = StyleSheet.create({

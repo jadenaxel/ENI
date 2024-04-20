@@ -1,19 +1,21 @@
 import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
-import { useContext, useEffect, useState, useRef } from "react";
+import { useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, useColorScheme } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
-import Sheet from "react-native-raw-bottom-sheet";
+import { Picker } from "@react-native-picker/picker";
 
 import { Actions, Context } from "@/Wrapper";
 import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
 import { AdBanner, CoverModal, Loader, Option, SeasonModal } from "@/components";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string =
+	//  __DEV__ ? TestIds.INTERSTITIAL :
+	Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
 
 const Item: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
@@ -25,18 +27,16 @@ const Item: FC = (): JSX.Element => {
 	const [modalCoverVisible, setModalCoverVisible] = useState<boolean>(false);
 	const [heart, setHeart] = useState<boolean>(false);
 	const [selectedSeason, setSelectedSeason] = useState<string>(ItemData.season?.at(-1).title ?? "");
-	const [selectedSort, setSelectedSort] = useState<string>("Name");
+	const [order, setOrder] = useState<string>("Nombre");
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-	const { background, backgroundURL, cover, coverURL, year, title, description, season, categories, trailer, watch, link } = ItemData;
+	const { background, backgroundURL, cover, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
 	const done: boolean = sensible === "123show" ? true : false;
 	const CanLoad: boolean = state.BannerAd === "Load";
-
-	const sortOrder: any = useRef();
 
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
@@ -73,10 +73,10 @@ const Item: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>
@@ -99,7 +99,7 @@ const Item: FC = (): JSX.Element => {
 										<Pressable
 											onPress={() => {
 												dispatch({ type: Actions.Categories, payload: category });
-												if (isLoaded && !Constants.IsDev) show();
+												if (isLoaded && Constants.IsDev) show();
 											}}
 										>
 											<View style={[styles.categories, { backgroundColor: PrincipalColor }]}>
@@ -126,8 +126,11 @@ const Item: FC = (): JSX.Element => {
 								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{selectedSeason}</Text>
 								<Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
 							</Pressable>
-							<Pressable onPress={() => sortOrder.current.open()}>
-								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Ordenar</Text>
+							<Pressable style={{ width: "10%" }}>
+								<Picker selectedValue={order} onValueChange={(itemValue: any) => setOrder(itemValue)}>
+									<Picker.Item label="Nombre" value="name" />
+									<Picker.Item label="Salida" value="salida" />
+								</Picker>
 							</Pressable>
 						</View>
 						{season
@@ -138,9 +141,7 @@ const Item: FC = (): JSX.Element => {
 									<View key={i}>
 										{item.chapter &&
 											item.chapter
-												.sort((a: any, b: any) =>
-													selectedSort === "Name" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)
-												)
+												.sort((a: any, b: any) => (order === "name" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)))
 												.map((chapter: any, key: number) => {
 													return (
 														<Link
@@ -155,13 +156,13 @@ const Item: FC = (): JSX.Element => {
 																		type: Actions.Links,
 																		payload: { item: { ...chapter }, contentTitle: title },
 																	});
-																	if (isLoaded && !Constants.IsDev) show();
+																	if (isLoaded && Constants.IsDev) show();
 																}}
 															>
 																<Text style={[styles.chapterTitle, { color: TextColor }]}>{chapter.title}</Text>
 																<View style={styles.chapterIcons}>
 																	<Feather name="chevron-right" size={25} color={TextColor} />
-																	<Pressable onPress={() => Linking.openURL(chapter.link[0])}>
+																	<Pressable onPress={() => Linking.openURL(chapter.links[0].link ?? chapter.link[0])}>
 																		<Feather name="download" size={25} color={TextColor} />
 																	</Pressable>
 																</View>
@@ -176,12 +177,12 @@ const Item: FC = (): JSX.Element => {
 				)}
 				{season === undefined && done && (
 					<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
-						{watch && (
+						{(watches || watch) && (
 							<Link href={"/(content)/chapter"} asChild style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.Links, payload: { item: ItemData, contentTitle: title } });
-										if (isLoaded && !Constants.IsDev) show();
+										if (isLoaded && Constants.IsDev) show();
 									}}
 								>
 									<Feather name="play" size={20} color={TextColor} />
@@ -189,16 +190,23 @@ const Item: FC = (): JSX.Element => {
 								</Pressable>
 							</Link>
 						)}
-						<Pressable onPress={() => Linking.openURL(link[0])} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
+						<Pressable
+							onPress={() => Linking.openURL(links?.hasOwnProperty("link") ? links[0].link : link[0])}
+							style={[styles.movieButton, { backgroundColor: PrincipalColor }]}
+						>
 							<Feather name="download" size={20} color={TextColor} />
 							<Text style={[styles.movieButtonText, { color: TextColor }]}>Descargar</Text>
 						</Pressable>
-						{link.length > 1 && (
-							<View>
-								<Text style={[styles.moreOption, styles.text]}>Mas Opciones</Text>
-								<Option data={link.slice(1)} />
-							</View>
-						)}
+						{links?.hasOwnProperty("link")
+							? links.length >= 1
+							: link.length >= 1 && (
+									<View>
+										<Text style={[styles.moreOption, styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>
+											Mas Opciones
+										</Text>
+										<Option data={links ? links.slice(1) : link.slice(1)} />
+									</View>
+							  )}
 						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
 							<Feather name="mail" size={20} color={TextColor} />
 							<Text style={[styles.movieButtonText, { color: TextColor }]}>Reportar</Text>
@@ -216,33 +224,6 @@ const Item: FC = (): JSX.Element => {
 					/>
 				)}
 			</ScrollView>
-			<Sheet customStyles={{ container: styles.sortOrder }} height={Sizes.windowHeight / 4} openDuration={250} ref={sortOrder}>
-				<View style={styles.sheetHeader}>
-					<Text style={styles.text}>Ordernar Por:</Text>
-				</View>
-				<View style={styles.sheetOption}>
-					<Pressable
-						style={styles.sheetOptionName}
-						onPress={() => {
-							setSelectedSort("Name");
-							sortOrder.current.close();
-						}}
-					>
-						<Text style={styles.text}>Nombre</Text>
-						{selectedSort === "Name" && <Feather name="check" color={Colors.text} size={20} />}
-					</Pressable>
-					<Pressable
-						style={styles.sheetOptionS}
-						onPress={() => {
-							setSelectedSort("Salida");
-							sortOrder.current.close();
-						}}
-					>
-						<Text style={styles.text}>Salida</Text>
-						{selectedSort !== "Name" && <Feather name="check" color={Colors.text} size={20} />}
-					</Pressable>
-				</View>
-			</Sheet>
 		</View>
 	);
 };

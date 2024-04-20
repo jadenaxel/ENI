@@ -2,7 +2,7 @@ import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
 import { useContext, useState } from "react";
-import { View, Text, StyleSheet, Pressable, Linking, useColorScheme } from "react-native";
+import { View, Text, StyleSheet, Pressable, Linking, useColorScheme, Image } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { WebView } from "react-native-webview";
@@ -15,9 +15,11 @@ const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
 
 	const { Links } = state;
-	const { note, title, link, watch } = Links.item;
+	const { note, title, link, links, watch, watches } = Links.item;
 
-	const [watchOption, setWatchOption] = useState<string>(watch ? watch[0] : "");
+	const isWatchesAvailable: any = watches && watches.hasOwnProperty("link") ? watches[0].link : watch ? watch[0] : "";
+
+	const [watchOption, setWatchOption] = useState<string>(isWatchesAvailable ?? "");
 
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
@@ -37,10 +39,10 @@ const Chapter: FC = (): JSX.Element => {
 			style={[
 				styles.main,
 				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && !Constants.IsDev && { paddingBottom: 70 },
+				CanLoad && Constants.IsDev && { paddingBottom: 70 },
 			]}
 		>
-			{!Constants.IsDev && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
+			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
 			<Text style={[styles.chapter, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			{watchOption.length > 0 && (
 				<View>
@@ -48,19 +50,24 @@ const Chapter: FC = (): JSX.Element => {
 						<WebView source={{ uri: watchOption }} allowsFullscreenVideo cacheEnabled contentMode="mobile" />
 					</View>
 					<View style={styles.options}>
-						{watch &&
-							watch.map((wa: any, i: number) => {
-								const siteName: string = wa.split("/")[2];
-								return (
-									<Pressable
-										onPress={() => setWatchOption(wa)}
-										key={i}
-										style={[styles.optionWatch, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}
-									>
-										<Text style={styles.optionWatchText}>{Url[siteName]?.title ?? siteName}</Text>
-									</Pressable>
-								);
-							})}
+						{(watches || watch).map((wa: any, i: number) => {
+							const typeOfLink = wa.hasOwnProperty("link") ? wa.link : wa;
+							const siteName: string = typeOfLink.split("/")[2];
+
+							return (
+								<Pressable
+									onPress={() => setWatchOption(wa)}
+									key={i}
+									style={[styles.optionWatch, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}
+								>
+									<Text style={styles.optionWatchText}>{Url[siteName]?.title ?? siteName}</Text>
+									{wa?.lang &&
+										wa.lang.map((langs: any, i: number) => {
+											return <Image source={{ uri: langs.asset.url }} key={i} style={styles.flags} />;
+										})}
+								</Pressable>
+							);
+						})}
 					</View>
 				</View>
 			)}
@@ -72,7 +79,7 @@ const Chapter: FC = (): JSX.Element => {
 			)}
 			<View>
 				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
-				<Option data={link} />
+				<Option data={links ?? link} />
 			</View>
 			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: PrincipalColor }]}>
 				<Feather name="mail" size={20} color={TextColor} />
@@ -106,9 +113,25 @@ const styles = StyleSheet.create({
 	optionWatch: {
 		padding: 10,
 		borderRadius: 4,
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 10,
 	},
 	optionWatchText: {
 		fontSize: Sizes.ajustFontSize(15),
+	},
+	flags: {
+		width: 20,
+		height: 20,
+	},
+
+	langs: {
+		fontSize: Sizes.ajustFontSize(20),
+		marginBottom: 5,
+	},
+	langsFlag: {
+		flexDirection: "row",
+		gap: 10,
 	},
 	noteContainer: {
 		borderRadius: 4,
