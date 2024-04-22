@@ -13,9 +13,7 @@ import { Actions, Context } from "@/Wrapper";
 import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
 import { AdBanner, CoverModal, Loader, Option, SeasonModal } from "@/components";
 
-const AD_STRING: string =
-	//  __DEV__ ? TestIds.INTERSTITIAL :
-	Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
 
 const Item: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
@@ -31,7 +29,7 @@ const Item: FC = (): JSX.Element => {
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-	const { background, backgroundURL, cover, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
+	const { backgroundURL, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
@@ -78,10 +76,10 @@ const Item: FC = (): JSX.Element => {
 		>
 			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<ImageBackground source={{ uri: backgroundURL ?? background?.asset.url }} style={styles.background} blurRadius={6}>
+				<ImageBackground source={{ uri: backgroundURL }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>
 						<Pressable onPress={() => setModalCoverVisible(true)} style={styles.cover}>
-							<Image style={styles.coverImage} source={{ uri: coverURL ?? cover?.asset.url }} />
+							<Image style={styles.coverImage} source={{ uri: coverURL }} />
 						</Pressable>
 						<Text style={styles.title}>{title}</Text>
 						<Pressable onPress={() => handleHeart()} style={styles.heart}>
@@ -213,7 +211,7 @@ const Item: FC = (): JSX.Element => {
 						</Pressable>
 					</View>
 				)}
-				<CoverModal modalCoverVisible={modalCoverVisible} setModalCoverVisible={setModalCoverVisible} image={coverURL ?? cover?.asset.url} />
+				<CoverModal modalCoverVisible={modalCoverVisible} setModalCoverVisible={setModalCoverVisible} image={coverURL} />
 				{season && done && (
 					<SeasonModal
 						modalSeasonVisible={modalSeasonVisible}

@@ -9,9 +9,12 @@ const initialValue: any = {
 	// store: "Jaden Smith",
 	store: "123show",
 	Data: "",
+
+	Movie: "",
+
 	SeriesItem: "",
 	Links: "",
-	Categories: "",
+	Categories: [],
 	BannerAd: "Load",
 
 	darkMode: "auto",
@@ -24,6 +27,7 @@ const initialValue: any = {
 export const Actions: any = {
 	Store: "Store",
 	All: "All",
+
 	SeriesItem: "Series Item",
 	Links: "Links",
 	Categories: "Categories",
@@ -41,8 +45,10 @@ const reducer = (state: any, action: any): any => {
 	switch (action.type) {
 		case Actions.Store:
 			return { ...state, store: action.payload };
+
 		case Actions.All:
 			return { ...state, Data: action.payload };
+
 		case Actions.SeriesItem:
 			return { ...state, SeriesItem: action.payload };
 		case Actions.Links:

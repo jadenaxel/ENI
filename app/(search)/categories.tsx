@@ -11,9 +11,7 @@ import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Card, AdBanner } from "@/components";
 
-const AD_STRING: string =
-	//  __DEV__ ? TestIds.INTERSTITIAL :
-	Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Categories: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);

@@ -9,13 +9,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Link, useFocusEffect } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
-import { Ads, Colors, Constants, LocalStorage, Query, Sizes } from "@/config";
+import { Ads, Constants, LocalStorage, Query, Sizes } from "@/config";
 import { AdBanner, Card, Loader, Title, useFetch } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string =
-	//  __DEV__ ? TestIds.INTERSTITIAL :
-	Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
 
 const More: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);

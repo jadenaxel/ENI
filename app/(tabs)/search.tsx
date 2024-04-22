@@ -13,9 +13,7 @@ import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from
 import { Ads, Colors, LocalStorage, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string =
-	//  __DEV__ ? TestIds.INTERSTITIAL :
-	Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
