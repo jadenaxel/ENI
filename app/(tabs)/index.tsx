@@ -97,13 +97,13 @@ const Home: FC = (): JSX.Element => {
 					keyExtractor={(item) => item.title}
 					onScroll={handleOnScroll}
 				/>
-				<Home_Dot
+				{/* <Home_Dot
 					data={allData?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
 					scrollX={scrollX}
 					deviceColor={deviceColor}
 					DarkModeType={DarkModeType}
 					PrincipalColor={PrincipalColor}
-				/>
+				/> */}
 				{Categories &&
 					Categories.sort((a: any, b: any) => a.title.localeCompare(b.title)).map((item: any, i: number) => {
 						const content: any = allData
