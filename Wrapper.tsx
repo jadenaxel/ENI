@@ -10,8 +10,6 @@ const initialValue: any = {
 	store: "123show",
 	Data: "",
 
-	Movie: "",
-
 	SeriesItem: "",
 	Links: "",
 	Categories: [],

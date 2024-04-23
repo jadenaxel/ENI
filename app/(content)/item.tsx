@@ -29,7 +29,7 @@ const Item: FC = (): JSX.Element => {
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-	const { backgroundURL, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
+	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
@@ -43,20 +43,20 @@ const Item: FC = (): JSX.Element => {
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
-	const getStorageData = async (title: string) => {
-		const contentData = await LocalStorage.getData(contentType, title);
+	const getStorageData = async (item: any) => {
+		const contentData = await LocalStorage.getData(contentType, item);
 		setHeart(contentData?.length > 0 ? true : false);
 	};
 
 	const handleHeart = async () => {
-		heart ? await LocalStorage.removeData(contentType, { title }) : await LocalStorage.saveData(contentType, { title });
+		heart ? await LocalStorage.removeData(contentType, _id) : await LocalStorage.saveData(contentType, { _id });
 		setHeart((prev: boolean): boolean => !prev);
 	};
 
 	const REPORT_MOVIE: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Pelicula"&body="La Pelicula ${title} tiene problema"`;
 
 	useEffect(() => {
-		getStorageData(title);
+		getStorageData(_id);
 		setIsLoading(false);
 	}, []);
 
@@ -67,14 +67,8 @@ const Item: FC = (): JSX.Element => {
 	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<View
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
-		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
+		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}>
+			{CanLoad && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>
@@ -97,7 +91,7 @@ const Item: FC = (): JSX.Element => {
 										<Pressable
 											onPress={() => {
 												dispatch({ type: Actions.Categories, payload: category });
-												if (isLoaded && Constants.IsDev) show();
+												if (isLoaded) show();
 											}}
 										>
 											<View style={[styles.categories, { backgroundColor: PrincipalColor }]}>
@@ -120,7 +114,7 @@ const Item: FC = (): JSX.Element => {
 				{season && done && (
 					<View style={styles.season}>
 						<View style={styles.seasonOption}>
-							<Pressable style={styles.selectSeason} onPress={() => setModalSeasonVisible(true)}>
+							<Pressable style={styles.selectSeason} onPress={() => season.length > 1 && setModalSeasonVisible(true)}>
 								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{selectedSeason}</Text>
 								<Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
 							</Pressable>
@@ -139,7 +133,7 @@ const Item: FC = (): JSX.Element => {
 									<View key={i}>
 										{item.chapter &&
 											item.chapter
-												.sort((a: any, b: any) => (order === "name" ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title)))
+												.sort((a: any, b: any) => (order === "name" ? b.title.localeCompare(a.title) : a.title.localeCompare(b.title)))
 												.map((chapter: any, key: number) => {
 													return (
 														<Link
@@ -154,7 +148,7 @@ const Item: FC = (): JSX.Element => {
 																		type: Actions.Links,
 																		payload: { item: { ...chapter }, contentTitle: title },
 																	});
-																	if (isLoaded && Constants.IsDev) show();
+																	if (isLoaded) show();
 																}}
 															>
 																<Text style={[styles.chapterTitle, { color: TextColor }]}>{chapter.title}</Text>
@@ -180,7 +174,7 @@ const Item: FC = (): JSX.Element => {
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.Links, payload: { item: ItemData, contentTitle: title } });
-										if (isLoaded && Constants.IsDev) show();
+										if (isLoaded) show();
 									}}
 								>
 									<Feather name="play" size={20} color={TextColor} />
@@ -189,20 +183,20 @@ const Item: FC = (): JSX.Element => {
 							</Link>
 						)}
 						<Pressable
-							onPress={() => Linking.openURL(links?.hasOwnProperty("link") ? links[0].link : link[0])}
+							onPress={() => (Linking.openURL(links)?.hasOwnProperty("link") ? links[0].link : link[0])}
 							style={[styles.movieButton, { backgroundColor: PrincipalColor }]}
 						>
 							<Feather name="download" size={20} color={TextColor} />
 							<Text style={[styles.movieButtonText, { color: TextColor }]}>Descargar</Text>
 						</Pressable>
-						{links?.hasOwnProperty("link")
+						{links !== null && links?.hasOwnProperty("link")
 							? links.length >= 1
 							: link.length >= 1 && (
 									<View>
 										<Text style={[styles.moreOption, styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>
 											Mas Opciones
 										</Text>
-										<Option data={links ? links.slice(1) : link.slice(1)} />
+										<Option data={links ? links?.slice(1) : link.slice(1)} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 									</View>
 							  )}
 						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>

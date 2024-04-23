@@ -35,14 +35,8 @@ const Chapter: FC = (): JSX.Element => {
 	const REPORT_SERIES: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Serie"&body="La Serei ${contentTitle} tiene problema. En el capitulo ${title}"`;
 
 	return (
-		<View
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
-		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
+		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}>
+			{CanLoad && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
 			<Text style={[styles.chapter, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			{watchOption.length > 0 && (
 				<View>

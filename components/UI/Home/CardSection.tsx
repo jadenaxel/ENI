@@ -23,7 +23,7 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore,
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-										if (isLoaded && Constants.IsDev) show();
+										if (isLoaded) show();
 									}}
 								>
 									<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />

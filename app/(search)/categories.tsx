@@ -60,13 +60,9 @@ const Categories: FC = (): JSX.Element => {
 
 	return (
 		<SafeAreaView
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
+			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
 		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
+			{CanLoad && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{categories.title}</Text>
 				<View style={styles.data}>
@@ -78,7 +74,7 @@ const Categories: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded && Constants.IsDev) show();
+											if (isLoaded) show();
 										}}
 									>
 										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />

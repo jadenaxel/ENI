@@ -8,18 +8,21 @@
             "distribution": "internal",
             "android": {
                 "buildType": "apk"
-            }
+            },
+            "channel": "development"
         },
         "preview": {
             "distribution": "internal",
             "android": {
                 "buildType": "apk"
-            }
+            },
+            "channel": "preview"
         },
         "production": {
             "developmentClient": false,
             "distribution": "internal",
-            "bun": "1.1.4"
+            "bun": "1.1.4",
+            "channel": "production"
         }
     },
     "submit": {

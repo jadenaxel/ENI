@@ -37,8 +37,8 @@ const More: FC = (): JSX.Element => {
 		const storageDataSeries = await LocalStorage.getData(Constants.SERIES);
 		const storageDataMovies = await LocalStorage.getData(Constants.MOVIES);
 
-		const Series: any = series?.filter((item: any) => storageDataSeries.some((series: any) => series.title === item.title));
-		const Movie: any = movie?.filter((item: any) => storageDataMovies.some((movie: any) => movie.title === item.title));
+		const Series: any = series?.filter((item: any) => storageDataSeries.some((series: any) => series._id === item._id));
+		const Movie: any = movie?.filter((item: any) => storageDataMovies.some((movie: any) => movie._id === item._id));
 
 		try {
 			setAllData([...Series, ...Movie]);
@@ -73,13 +73,9 @@ const More: FC = (): JSX.Element => {
 
 	return (
 		<SafeAreaView
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
+			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
 		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
+			{CanLoad && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				<View style={styles.card}>
@@ -89,7 +85,7 @@ const More: FC = (): JSX.Element => {
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-										if (isLoaded && Constants.IsDev) show();
+										if (isLoaded) show();
 									}}
 								>
 									<Card deviceColor={deviceColor} DarkModeType={DarkModeType} item={item} key={i} />

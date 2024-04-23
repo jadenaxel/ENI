@@ -8,8 +8,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import { Link } from "expo-router";
 
-import { Colors, Ads, Sizes, LocalStorage, Query, Constants } from "@/config";
-import { AdBanner, Loader, useFetch, Error, Card_Section, Title, Home_Slider, Home_Dot, Database } from "@/components";
+import { Colors, Ads, Sizes, LocalStorage, Constants, Query } from "@/config";
+import { AdBanner, Loader, Card_Section, Title, Home_Slider, Home_Dot, Database, useFetch, Error } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
@@ -68,13 +68,9 @@ const Home: FC = (): JSX.Element => {
 
 	return (
 		<SafeAreaView
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
+			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
 		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
+			{CanLoad && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
@@ -90,19 +86,19 @@ const Home: FC = (): JSX.Element => {
 							<Pressable
 								onPress={() => {
 									dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-									if (isLoaded && Constants.IsDev) show();
+									if (isLoaded) show();
 								}}
 							>
 								<Home_Slider item={item} />
 							</Pressable>
 						</Link>
 					)}
-					data={allData.slice(0, DATA_SIZE_CONTENT)?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt))}
+					data={allData?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
 					keyExtractor={(item) => item.title}
 					onScroll={handleOnScroll}
 				/>
 				<Home_Dot
-					data={allData.slice(0, DATA_SIZE_CONTENT)?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt))}
+					data={allData?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
 					scrollX={scrollX}
 					deviceColor={deviceColor}
 					DarkModeType={DarkModeType}

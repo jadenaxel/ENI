@@ -1,7 +1,7 @@
 import type { FC } from "react";
 
-import { useEffect, useState } from "react";
-import { Text, StyleSheet, Pressable, Linking, Alert, FlatList, Image } from "react-native";
+import { Fragment, useEffect, useState } from "react";
+import { Text, StyleSheet, Pressable, Linking, Alert, Image, View } from "react-native";
 
 import { Ads, Colors, Sizes, Url } from "@/config";
 import { Feather } from "@expo/vector-icons";
@@ -9,28 +9,25 @@ import { Feather } from "@expo/vector-icons";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import Loader from "./Loader";
 
-const AD_STRING: string =
-	// __DEV__ ? TestIds.INTERSTITIAL :
-	Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
 
 const Item: FC<any> = ({ item, handleDownload }: any): JSX.Element => {
-	const typeOfLink = item.item.hasOwnProperty("link") ? item.item.link : item.item;
+	const typeOfLink = item.hasOwnProperty("link") ? item.link : item;
 	const siteName: string = typeOfLink.includes("magnet") ? "Magnet" : typeOfLink.split("/")[2];
 
 	return (
-		<Pressable onPress={() => handleDownload(item.item, item.index)} style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}>
+		<Pressable onPress={() => handleDownload(item, item.index)} style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}>
 			<Text style={[styles.optionText, { color: Url[siteName]?.text ?? Colors.text }]}>{Url[siteName]?.title ?? siteName}</Text>
 			<Feather name="download" size={15} color={Url[siteName]?.text ?? Colors.text} />
-			{item.item.lang &&
-				item.item.lang?.map((langs: any, i: number) => {
+			{item.lang &&
+				item.lang?.map((langs: any, i: number) => {
 					return <Image source={{ uri: langs.asset.url }} key={i} style={styles.flags} />;
 				})}
 		</Pressable>
 	);
 };
 
-const Option: FC<any> = ({ data }: any): JSX.Element => {
-	const [toGo, setToGo] = useState<string>("");
+const Option: FC<any> = ({ data, deviceColor, DarkModeType }: any): JSX.Element => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
@@ -46,39 +43,34 @@ const Option: FC<any> = ({ data }: any): JSX.Element => {
 		if (i === 0) OpenLink(item);
 		if (isLoaded && i !== 0) {
 			show();
-			setToGo(item);
+			OpenLink(item);
 		}
 	};
-
-	useEffect(() => {
-		if (isClosed) OpenLink(toGo);
-	}, [toGo, isClosed]);
 
 	useEffect(() => {
 		load();
 	}, [load, isClosed]);
 
-	if (isLoading) return <Loader />;
+	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<FlatList
-			disableVirtualization={true}
-			data={data}
-			numColumns={2}
-			renderItem={(item: any) => <Item item={item} handleDownload={handleDownload} />}
-			keyExtractor={(item: any) => item}
-			columnWrapperStyle={styles.optionFlat}
-		/>
+		<View style={styles.optionContainer}>
+			{data.map((item: any, i: number) => {
+				return <Item key={i} item={item} handleDownload={handleDownload} />;
+			})}
+		</View>
 	);
 };
 const styles = StyleSheet.create({
-	optionFlat: {
+	optionContainer: {
+		flexDirection: "row",
+		flexWrap: "wrap",
 		gap: 10,
+		marginBottom: 10,
 	},
 	option: {
 		padding: 15,
 		borderRadius: 4,
-		marginBottom: 10,
 
 		flexDirection: "row",
 		justifyContent: "center",
@@ -88,7 +80,7 @@ const styles = StyleSheet.create({
 
 		gap: 5,
 
-		flex: 1,
+		width: "100%",
 	},
 	optionText: {
 		textTransform: "capitalize",

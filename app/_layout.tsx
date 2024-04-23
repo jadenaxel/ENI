@@ -1,5 +1,6 @@
 import type { FC } from "react";
 
+import "expo-dev-client"
 import { Stack } from "expo-router";
 import { vexo } from "vexo-analytics";
 

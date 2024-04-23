@@ -72,13 +72,9 @@ const Search: FC = (): JSX.Element => {
 
 	return (
 		<SafeAreaView
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 80 },
-			]}
+			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 80 }]}
 		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
+			{CanLoad && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
 					<View
@@ -123,7 +119,7 @@ const Search: FC = (): JSX.Element => {
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded && Constants.IsDev) show();
+														if (isLoaded) show();
 													}}
 													style={styles.descubreCard}
 												>
@@ -147,7 +143,7 @@ const Search: FC = (): JSX.Element => {
 												<Pressable
 													onPress={() => {
 														dispatch({ type: Actions.Categories, payload: item });
-														if (isLoaded && Constants.IsDev) show();
+														if (isLoaded) show();
 													}}
 													style={styles.categoriesCard}
 												>
@@ -168,7 +164,7 @@ const Search: FC = (): JSX.Element => {
 									<Pressable
 										onPress={() => {
 											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-											if (isLoaded && Constants.IsDev) show();
+											if (isLoaded) show();
 										}}
 									>
 										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />

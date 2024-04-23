@@ -7,6 +7,7 @@ import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
+import * as Updates from "expo-updates";
 
 import { Ads, Colors, Constants, Sizes } from "@/config";
 import { AdBanner, Title } from "@/components";
@@ -17,19 +18,31 @@ const More: FC = (): JSX.Element => {
 
 	const CanLoad: boolean = state.BannerAd === "Load";
 
+	const userColor: string = state.colorOne;
+	const textColor: string = state.textColor;
+
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
+	const onFetchUpdateAsync = async () => {
+		try {
+			const update = await Updates.checkForUpdateAsync();
+			if (update.isAvailable) {
+				await Updates.fetchUpdateAsync();
+				await Updates.reloadAsync();
+			}
+		} catch (error) {
+			// You can also add an alert() to see the error message in case of an error when fetching updates.
+			alert(`Error fetching latest Expo update: ${error}`);
+		}
+	};
+
 	return (
 		<SafeAreaView
-			style={[
-				styles.main,
-				{ backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) },
-				CanLoad && Constants.IsDev && { paddingBottom: 70 },
-			]}
+			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
 		>
-			{Constants.IsDev && CanLoad && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
+			{CanLoad && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
 			<ScrollView>
 				<Title title="Ajustes" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				{/* <Link href={"/(more)/profile"} asChild style={styles.profile}>
@@ -55,6 +68,9 @@ const More: FC = (): JSX.Element => {
 				</Pressable>
 				{/* Cambiar color de la app */}
 				{/* Eliminar anuncios */}
+				<Pressable style={[styles.update, { backgroundColor: userColor }]} onPress={() => onFetchUpdateAsync()}>
+					<Text style={[styles.textUpdate, { color: textColor }]}>Buscar Actualizacion</Text>
+				</Pressable>
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -88,6 +104,17 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 	},
 	settingListText: {
+		fontSize: Sizes.ajustFontSize(16),
+	},
+	update: {
+		marginVertical: 20,
+		backgroundColor: "#0088cc",
+		borderRadius: 4,
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 10,
+	},
+	textUpdate: {
 		fontSize: Sizes.ajustFontSize(16),
 	},
 });

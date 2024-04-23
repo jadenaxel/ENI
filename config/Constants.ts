@@ -6,8 +6,7 @@ const Color: any = Colors;
 export default {
 	SERIES: "series",
 	MOVIES: "movies",
-	CATEGORIES: ["Anime", "Pelicula", "Serie"],
-	IsDev: __DEV__,
+	CATEGORIES: ["Animes", "Peliculas", "Series"],
 	SchemeColor: {
 		auto: "auto",
 		light: "light",
