@@ -2,13 +2,14 @@ import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
 import { useContext, useEffect, useState, useRef } from "react";
-import { Animated, StyleSheet, ScrollView, View, FlatList, Pressable, useColorScheme } from "react-native";
+import { Animated, StyleSheet, ScrollView, View, Pressable, useColorScheme } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import { Link } from "expo-router";
+import * as Updates from "expo-updates";
 
-import { Colors, Ads, Sizes, LocalStorage, Constants, Query } from "@/config";
+import { Colors, Ads, Sizes, Constants, Query } from "@/config";
 import { AdBanner, Loader, Card_Section, Title, Home_Slider, Home_Dot, Database, useFetch, Error } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
@@ -21,7 +22,6 @@ const Home: FC = (): JSX.Element => {
 	const [Categories, setCategories] = useState<any>([]);
 
 	const [loading, setLoading] = useState<boolean>(true);
-	const [appstore, setAppStore] = useState<string>("");
 
 	const { state, dispatch }: any = useContext(Context);
 
@@ -30,24 +30,71 @@ const Home: FC = (): JSX.Element => {
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
 
 	const scrollX: any = useRef(new Animated.Value(0)).current;
+	const scrollTo: any = useRef();
+
+	const appstore = state.store;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	const PrincipalColor: string = state.colorOne;
+
 	const CanLoad: boolean = state.BannerAd === "Load";
 
-	const getLocalData = async (): Promise<void> => {
-		const LocalData = await LocalStorage.getData("appstore");
-		const realData = LocalData.length > 0 ? LocalData[0] : state.store;
-		setAppStore(realData);
-	};
+	let intervalId: any;
+	let currentScrollX = 0;
+	let isForward = true;
+	const maxScrollX = Sizes.windowWidth * (allData.slice(0, DATA_SIZE_CONTENT).length - 1);
 
 	const handleOnScroll = (event: any) => Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })(event);
 
+	const onFetchUpdateAsync = async () => {
+		try {
+			const update = await Updates.checkForUpdateAsync();
+			if (update.isAvailable) {
+				await Updates.fetchUpdateAsync();
+				await Updates.reloadAsync();
+			}
+		} catch (error) {}
+	};
+
+	const startAutoScroll = () => {
+		intervalId = setInterval(() => {
+			if (isForward) {
+				// Avanzar
+				currentScrollX += Sizes.windowWidth;
+				if (currentScrollX > maxScrollX) {
+					currentScrollX = maxScrollX;
+					isForward = false; // Cambia la dirección al final
+				}
+			} else {
+				currentScrollX -= Sizes.windowWidth;
+				if (currentScrollX < 0) {
+					currentScrollX = 0;
+					isForward = true; // Cambia la dirección al inicio
+				}
+			}
+			scrollTo.current?.scrollTo({ x: currentScrollX, y: 0, animated: true });
+		}, 5000);
+	};
+
+	const handleMomentumScrollEnd = (event: any) => {
+		currentScrollX = event.nativeEvent.contentOffset.x;
+		isForward = currentScrollX === 0;
+		clearInterval(intervalId);
+	};
+
 	useEffect(() => {
-		getLocalData();
+		startAutoScroll();
+
+		return () => {
+			clearInterval(intervalId);
+		};
+	}, [allData]);
+
+	useEffect(() => {
+		onFetchUpdateAsync();
 		Database({ setCategories, dispatch });
 	}, []);
 
@@ -75,35 +122,39 @@ const Home: FC = (): JSX.Element => {
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				</View>
-				<FlatList
+				<ScrollView
 					horizontal
-					disableVirtualization
 					pagingEnabled
-					showsHorizontalScrollIndicator={false}
-					snapToAlignment="center"
-					renderItem={({ item }) => (
-						<Link href={"/(content)/item"} asChild>
-							<Pressable
-								onPress={() => {
-									dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
-									if (isLoaded) show();
-								}}
-							>
-								<Home_Slider item={item} />
-							</Pressable>
-						</Link>
-					)}
-					data={allData?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
-					keyExtractor={(item) => item.title}
+					showsHorizontalScrollIndicator
 					onScroll={handleOnScroll}
-				/>
-				{/* <Home_Dot
-					data={allData?.sort((a: any, b: any) => b._createdAt?.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
+					ref={scrollTo}
+					onMomentumScrollEnd={(event: any) => handleMomentumScrollEnd(event)}
+				>
+					{allData
+						.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
+						.slice(0, DATA_SIZE_CONTENT)
+						.map((item: any, i: number) => {
+							return (
+								<Link href={"/(content)/item"} asChild key={i}>
+									<Pressable
+										onPress={() => {
+											dispatch({ type: Actions.SeriesItem, payload: { item } });
+											if (isLoaded) show();
+										}}
+									>
+										<Home_Slider item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+									</Pressable>
+								</Link>
+							);
+						})}
+				</ScrollView>
+				<Home_Dot
+					data={allData.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
 					scrollX={scrollX}
 					deviceColor={deviceColor}
 					DarkModeType={DarkModeType}
 					PrincipalColor={PrincipalColor}
-				/> */}
+				/>
 				{Categories &&
 					Categories.sort((a: any, b: any) => a.title.localeCompare(b.title)).map((item: any, i: number) => {
 						const content: any = allData

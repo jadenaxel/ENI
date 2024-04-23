@@ -10,14 +10,13 @@ import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
-import { Ads, Colors, LocalStorage, Query, Sizes, Constants } from "@/config";
+import { Ads, Colors, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
-	const [appstore, setAppStore] = useState<string>("");
 	const [searchData, setSearchData] = useState<any>([]);
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
@@ -52,16 +51,6 @@ const Search: FC = (): JSX.Element => {
 		setSearch("");
 		setSearchData([]);
 	};
-
-	const getLocalData = async () => {
-		const LocalData = await LocalStorage.getData("appstore");
-		const realData = LocalData.length > 0 ? LocalData[0] : state.store;
-		setAppStore(realData);
-	};
-
-	useEffect(() => {
-		getLocalData();
-	}, []);
 
 	useEffect(() => {
 		load();
@@ -163,7 +152,7 @@ const Search: FC = (): JSX.Element => {
 								<Link key={i} href={"/(content)/item"} asChild>
 									<Pressable
 										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
+											dispatch({ type: Actions.SeriesItem, payload: { item } });
 											if (isLoaded) show();
 										}}
 									>

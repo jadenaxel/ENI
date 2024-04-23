@@ -4,13 +4,15 @@ import { memo } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 
 import { Colors, Sizes } from "@/config";
+import Loader from "../Loader";
 
 const Slider: FC<any> = (props: any): JSX.Element => {
+	const { deviceColor, DarkModeType } = props;
 	const { title, background, backgroundURL }: any = props.item;
 
 	return (
 		<View style={styles.main}>
-			<Image source={{ uri: background ?? backgroundURL }} style={styles.image} resizeMode="cover" borderRadius={10} />
+			<Image src={background ?? backgroundURL} style={styles.image} resizeMode="cover" borderRadius={10} />
 			<View style={styles.cover}>
 				<Text style={styles.text}>{title}</Text>
 			</View>

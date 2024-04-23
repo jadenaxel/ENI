@@ -64,4 +64,8 @@ export const Url: any = {
 		title: "Your Upload",
 		color: "#337ab7",
 	},
+	"fastream.to": {
+		title: "Fast Stream",
+		color: "#ff0000",
+	},
 };

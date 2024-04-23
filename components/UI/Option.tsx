@@ -1,6 +1,6 @@
 import type { FC } from "react";
 
-import { Fragment, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, StyleSheet, Pressable, Linking, Alert, Image, View } from "react-native";
 
 import { Ads, Colors, Sizes, Url } from "@/config";
@@ -55,9 +55,9 @@ const Option: FC<any> = ({ data, deviceColor, DarkModeType }: any): JSX.Element 
 
 	return (
 		<View style={styles.optionContainer}>
-			{data.map((item: any, i: number) => {
-				return <Item key={i} item={item} handleDownload={handleDownload} />;
-			})}
+			{data.map((item: any, i: number) => (
+				<Item key={i} item={item} handleDownload={handleDownload} />
+			))}
 		</View>
 	);
 };

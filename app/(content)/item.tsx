@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
-import { useContext, useEffect, useState } from "react";
+import { Fragment, useContext, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, useColorScheme } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -18,7 +18,7 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME
 const Item: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 	const ItemData: any = state.SeriesItem.item;
-	const sensible: string = state.SeriesItem.appstore;
+	const sensible: string = state.store;
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [modalSeasonVisible, setModalSeasonVisible] = useState<boolean>(false);
@@ -33,7 +33,7 @@ const Item: FC = (): JSX.Element => {
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
-	const done: boolean = sensible === "123show" ? true : false;
+	const done: boolean = sensible === "123show";
 	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const PrincipalColor: string = state.colorOne;
@@ -45,7 +45,7 @@ const Item: FC = (): JSX.Element => {
 
 	const getStorageData = async (item: any) => {
 		const contentData = await LocalStorage.getData(contentType, item);
-		setHeart(contentData?.length > 0 ? true : false);
+		setHeart(contentData?.length > 0);
 	};
 
 	const handleHeart = async () => {
@@ -116,7 +116,7 @@ const Item: FC = (): JSX.Element => {
 						<View style={styles.seasonOption}>
 							<Pressable style={styles.selectSeason} onPress={() => season.length > 1 && setModalSeasonVisible(true)}>
 								<Text style={[styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{selectedSeason}</Text>
-								<Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />
+								{season.length > 1 && <Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />}
 							</Pressable>
 							<Pressable style={{ width: "10%" }}>
 								<Picker selectedValue={order} onValueChange={(itemValue: any) => setOrder(itemValue)}>
@@ -130,7 +130,7 @@ const Item: FC = (): JSX.Element => {
 							.map((item: any, i: number) => {
 								if (selectedSeason !== item.title) return null;
 								return (
-									<View key={i}>
+									<Fragment key={i}>
 										{item.chapter &&
 											item.chapter
 												.sort((a: any, b: any) => (order === "name" ? b.title.localeCompare(a.title) : a.title.localeCompare(b.title)))
@@ -162,7 +162,7 @@ const Item: FC = (): JSX.Element => {
 														</Link>
 													);
 												})}
-									</View>
+									</Fragment>
 								);
 							})}
 					</View>

@@ -1,46 +1,25 @@
 import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
-import { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme, TouchableHighlight } from "react-native";
+import { useContext } from "react";
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import * as Updates from "expo-updates";
 
 import { Ads, Colors, Constants, Sizes } from "@/config";
-import { AdBanner, Loader, Title } from "@/components";
+import { AdBanner, Title } from "@/components";
 import { Context } from "@/Wrapper";
 
 const More: FC = (): JSX.Element => {
-	const [isLoading, setIsLoading] = useState<boolean>(false);
 	const { state }: any = useContext(Context);
 
 	const CanLoad: boolean = state.BannerAd === "Load";
 
-	const userColor: string = state.colorOne;
-	const textColor: string = state.textColor;
-
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
-
-	const onFetchUpdateAsync = async () => {
-		setIsLoading(true);
-		try {
-			const update = await Updates.checkForUpdateAsync();
-			if (update.isAvailable) {
-				await Updates.fetchUpdateAsync();
-				await Updates.reloadAsync();
-			}
-		} catch (error) {
-			alert(`Error fetching latest Expo update: ${error}`);
-		}
-		setIsLoading(false);
-	};
-
-	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
 		<SafeAreaView
@@ -72,9 +51,6 @@ const More: FC = (): JSX.Element => {
 				</Pressable>
 				{/* Cambiar color de la app */}
 				{/* Eliminar anuncios */}
-				<TouchableHighlight style={[styles.update, { backgroundColor: userColor }]} onPress={() => onFetchUpdateAsync()}>
-					<Text style={[styles.textUpdate, { color: textColor }]}>Buscar Actualizacion</Text>
-				</TouchableHighlight>
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -108,17 +84,6 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 	},
 	settingListText: {
-		fontSize: Sizes.ajustFontSize(16),
-	},
-	update: {
-		marginVertical: 20,
-		backgroundColor: "#0088cc",
-		borderRadius: 4,
-		justifyContent: "center",
-		alignItems: "center",
-		padding: 10,
-	},
-	textUpdate: {
 		fontSize: Sizes.ajustFontSize(16),
 	},
 });

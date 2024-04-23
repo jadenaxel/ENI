@@ -19,7 +19,7 @@ const SeasonModal: FC<any> = ({ modalSeasonVisible, setModalSeasonVisible, setSe
 								setModalSeasonVisible(false);
 							}}
 						>
-							<Text style={[styles.seasonTitleModal, selectedSeason === item.title ? { fontSize: Sizes.ajustFontSize(20) } : null]}>
+							<Text style={[styles.seasonTitleModal, selectedSeason === item.title && { fontSize: Sizes.ajustFontSize(20) } ]}>
 								{item.title}
 							</Text>
 						</Pressable>
