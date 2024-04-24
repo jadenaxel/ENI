@@ -4,7 +4,10 @@ import { DB, Query } from "@/config";
 import { Actions } from "@/Wrapper";
 
 const DB_NAME: string = "category.db";
-const DB_VERSION: string = "1.0.0";
+const DB_VERSION: string = "2.0.0";
+
+const date = new Date().toLocaleDateString("en-CA", { year: "numeric", month: "2-digit", day: "2-digit" });
+const lasTimeIn: any = [];
 
 const doFetch = async (uri: string, dispatch?: any, action?: any): Promise<any> => {
 	const request: Response = await fetch(uri);
@@ -17,22 +20,16 @@ const doFetch = async (uri: string, dispatch?: any, action?: any): Promise<any> 
 const Database = async ({ setCategories, dispatch }: any) => {
 	const db: SQLite.SQLiteDatabase = SQLite.openDatabase(DB_NAME, DB_VERSION);
 
-	const lasTimeIn: any = [];
-	const date = new Date().toLocaleDateString("en-CA", { year: "numeric", month: "2-digit", day: "2-digit" });
-
 	await db.transactionAsync(async (tx: any) => {
 		await tx.executeSqlAsync(DB.CREATE_TABLE_LAST_TIME_IN);
 		await tx.executeSqlAsync(DB.CREATE_TABLE_CATEGORIES);
-	});
-
-	await db.transactionAsync(async (tx: any) => {
-		const getLastTimeIn = await tx.executeSqlAsync(DB.GET_COLUMNS_LAST_TIME_IN);
-		getLastTimeIn.rows.length > 0 && lasTimeIn.push(getLastTimeIn.rows[0].lastimein);
 		await tx.executeSqlAsync(DB.SAVE_COLUMNS_LAST_TIME_IN, [date]);
-	});
 
-	await db.transactionAsync(async (tx: any) => {
+		const getLastTimeIn = await tx.executeSqlAsync(DB.GET_COLUMNS_LAST_TIME_IN);
 		const getCategories = await tx.executeSqlAsync(DB.GET_COLUMNS_CATEGORIES);
+
+		getLastTimeIn.rows.length > 0 && lasTimeIn.push(getLastTimeIn.rows[0].lastimein);
+
 		if (getCategories.rows.length > 0) {
 			const result = await doFetch(Query.CheckNewCategories.Query(lasTimeIn[0]));
 			const alreadyExists = getCategories.rows.filter((c: any) => result.some((re: any) => re._id === c._id));
