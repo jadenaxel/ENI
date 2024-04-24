@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, Pressable, ScrollView, useColorScheme, SafeArea
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
-import { Ads, Colors, Constants, LocalStorage, Sizes } from "@/config";
+import { Ads, Colors, Constants, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Card, AdBanner } from "@/components";
 

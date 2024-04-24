@@ -17,10 +17,22 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_
 
 const DATA_SIZE_CONTENT: number = 10;
 
+let intervalId: any;
+let currentScrollX = 0;
+let isForward = true;
+
+const onFetchUpdateAsync = async () => {
+	try {
+		const update = await Updates.checkForUpdateAsync();
+		if (update.isAvailable) {
+			await Updates.fetchUpdateAsync();
+			await Updates.reloadAsync();
+		}
+	} catch (error) {}
+};
+
 const Home: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
-
-	const [loading, setLoading] = useState<boolean>(true);
 
 	const { state, dispatch }: any = useContext(Context);
 
@@ -38,22 +50,9 @@ const Home: FC = (): JSX.Element => {
 
 	const CanLoad: boolean = BannerAd === "Load";
 
-	let intervalId: any;
-	let currentScrollX = 0;
-	let isForward = true;
 	const maxScrollX = Sizes.windowWidth * (allData.slice(0, DATA_SIZE_CONTENT).length - 1);
 
 	const handleOnScroll = (event: any) => Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })(event);
-
-	const onFetchUpdateAsync = async () => {
-		try {
-			const update = await Updates.checkForUpdateAsync();
-			if (update.isAvailable) {
-				await Updates.fetchUpdateAsync();
-				await Updates.reloadAsync();
-			}
-		} catch (error) {}
-	};
 
 	const startAutoScroll = () => {
 		intervalId = setInterval(() => {
@@ -81,6 +80,8 @@ const Home: FC = (): JSX.Element => {
 		clearInterval(intervalId);
 	};
 
+	console.log("first");
+
 	useEffect(() => {
 		startAutoScroll();
 
@@ -94,10 +95,6 @@ const Home: FC = (): JSX.Element => {
 	}, []);
 
 	useEffect(() => {
-		if (Categories.length > 0 && allData.length > 0) setLoading(false);
-	}, [Categories, allData]);
-
-	useEffect(() => {
 		if (data.hasOwnProperty("movie")) setAllData([...data.movie, ...data.series]);
 	}, [isLoading]);
 
@@ -106,7 +103,7 @@ const Home: FC = (): JSX.Element => {
 	}, [load, isClosed]);
 
 	if (error[0]) return <Error deviceColor={deviceColor} DarkModeType={DarkModeType} />;
-	if (isLoading && loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
 		<SafeAreaView
@@ -137,7 +134,7 @@ const Home: FC = (): JSX.Element => {
 											if (isLoaded) show();
 										}}
 									>
-										<Home_Slider item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+										<Home_Slider item={item} />
 									</Pressable>
 								</Link>
 							);
@@ -151,7 +148,7 @@ const Home: FC = (): JSX.Element => {
 					PrincipalColor={colorOne}
 				/>
 				{Categories &&
-					Categories.sort((a: any, b: any) => a.title.localeCompare(b.title)).map((item: any, i: number) => {
+					Categories.map((item: any, i: number) => {
 						const content: any = allData
 							.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
 							.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
