@@ -15,7 +15,6 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_
 
 const Categories: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
-	const [appstore, setAppStore] = useState<string>("");
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
@@ -40,16 +39,6 @@ const Categories: FC = (): JSX.Element => {
 		setAllData([...SeriesFiler, ...MovieFiler]);
 	};
 
-	const getLocalData = async () => {
-		const LocalData = await LocalStorage.getData("appstore");
-		const realData = LocalData.length > 0 ? LocalData[0] : state.store;
-		setAppStore(realData);
-	};
-
-	useEffect(() => {
-		getLocalData();
-	}, []);
-
 	useEffect(() => {
 		load();
 	}, [load, isClosed]);
@@ -73,7 +62,7 @@ const Categories: FC = (): JSX.Element => {
 								<Link key={i} href={"/(content)/item"} asChild>
 									<Pressable
 										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
+											dispatch({ type: Actions.SeriesItem, payload: { item } });
 											if (isLoaded) show();
 										}}
 									>

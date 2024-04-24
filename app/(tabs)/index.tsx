@@ -10,7 +10,7 @@ import { Link } from "expo-router";
 import * as Updates from "expo-updates";
 
 import { Colors, Ads, Sizes, Constants, Query } from "@/config";
-import { AdBanner, Loader, Card_Section, Title, Home_Slider, Home_Dot, Database, useFetch, Error } from "@/components";
+import { AdBanner, Loader, Card_Section, Title, Home_Slider, Home_Dot, useFetch, Error } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
@@ -19,28 +19,24 @@ const DATA_SIZE_CONTENT: number = 10;
 
 const Home: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
-	const [Categories, setCategories] = useState<any>([]);
 
 	const [loading, setLoading] = useState<boolean>(true);
 
 	const { state, dispatch }: any = useContext(Context);
 
 	const { isLoaded, isClosed, load, show }: any = useInterstitialAd(AD_STRING);
+	const { store, darkMode, colorOne, BannerAd } = state;
 
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
+	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories }).data;
 
 	const scrollX: any = useRef(new Animated.Value(0)).current;
 	const scrollTo: any = useRef();
 
-	const appstore = state.store;
-
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
-	const PrincipalColor: string = state.colorOne;
-
-	const CanLoad: boolean = state.BannerAd === "Load";
+	const CanLoad: boolean = BannerAd === "Load";
 
 	let intervalId: any;
 	let currentScrollX = 0;
@@ -95,7 +91,6 @@ const Home: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		onFetchUpdateAsync();
-		Database({ setCategories, dispatch });
 	}, []);
 
 	useEffect(() => {
@@ -153,7 +148,7 @@ const Home: FC = (): JSX.Element => {
 					scrollX={scrollX}
 					deviceColor={deviceColor}
 					DarkModeType={DarkModeType}
-					PrincipalColor={PrincipalColor}
+					PrincipalColor={colorOne}
 				/>
 				{Categories &&
 					Categories.sort((a: any, b: any) => a.title.localeCompare(b.title)).map((item: any, i: number) => {
@@ -171,7 +166,7 @@ const Home: FC = (): JSX.Element => {
 								dispatch={dispatch}
 								isLoaded={isLoaded}
 								show={show}
-								appstore={appstore}
+								appstore={store}
 								DATA_SIZE_CONTENT={DATA_SIZE_CONTENT}
 								deviceColor={deviceColor}
 								DarkModeType={DarkModeType}

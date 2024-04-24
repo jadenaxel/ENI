@@ -4,13 +4,21 @@ import { memo } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable } from "react-native";
 
 import { Link } from "expo-router";
-import { Feather } from "@expo/vector-icons";
 
-import { Sizes, Constants, Colors } from "@/config";
+import { Sizes, Constants } from "@/config";
 import { Actions } from "@/Wrapper";
 import Card from "../Card";
 
-const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore, DATA_SIZE_CONTENT, deviceColor, DarkModeType }: any): JSX.Element => {
+const CardSection: FC<any> = ({
+	data,
+	title,
+	dispatch,
+	isLoaded,
+	show,
+	DATA_SIZE_CONTENT,
+	deviceColor,
+	DarkModeType,
+}: any): JSX.Element => {
 	return (
 		<View style={styles.main}>
 			<Text style={[styles.lastSeriesTitle, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
@@ -23,7 +31,7 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore,
 							<Link key={i} href={"/(content)/item"} asChild>
 								<Pressable
 									onPress={() => {
-										dispatch({ type: Actions.SeriesItem, payload: { item, appstore } });
+										dispatch({ type: Actions.SeriesItem, payload: { item } });
 										if (isLoaded) show();
 									}}
 								>
@@ -32,9 +40,6 @@ const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, appstore,
 							</Link>
 						);
 					})}
-				<Pressable style={styles.more}>
-					<Feather name="chevron-right" size={20} color={"white"} />
-				</Pressable>
 			</ScrollView>
 		</View>
 	);
@@ -57,7 +62,6 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: Colors.black,
 		width: 50,
 		height: 100,
 		borderRadius: 50,

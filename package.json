@@ -1,7 +1,7 @@
 {
     "name": "eni",
     "main": "expo-router/entry",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "scripts": {
         "start": "expo start",
         "android": "expo run:android",
@@ -22,7 +22,6 @@
         "expo-linking": "~6.2.2",
         "expo-router": "~3.4.8",
         "expo-splash-screen": "~0.26.4",
-        "expo-sqlite": "~13.4.0",
         "expo-status-bar": "~1.11.1",
         "expo-system-ui": "~2.9.4",
         "expo-updates": "~0.24.12",

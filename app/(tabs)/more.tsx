@@ -8,6 +8,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
+import { version } from "@/package.json";
 import { Ads, Colors, Constants, Sizes } from "@/config";
 import { AdBanner, Title } from "@/components";
 import { Context } from "@/Wrapper";
@@ -51,6 +52,10 @@ const More: FC = (): JSX.Element => {
 				</Pressable>
 				{/* Cambiar color de la app */}
 				{/* Eliminar anuncios */}
+				<View style={{ flexDirection: "row" }}>
+					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>App Version: </Text>
+					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{version}</Text>
+				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);

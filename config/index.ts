@@ -5,9 +5,8 @@ import Query from "./Query";
 import LocalStorage from "./LocalStorage";
 import Constants from "./Constants";
 import { Url } from "./Url";
-import DB from "./DB";
 
 import type { Props, Return } from "./Types";
 
-export { Colors, Ads, Sizes, Query, LocalStorage, Constants, Url, DB };
+export { Colors, Ads, Sizes, Query, LocalStorage, Constants, Url };
 export type { Props, Return };
