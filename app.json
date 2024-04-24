@@ -2,7 +2,7 @@
     "expo": {
         "name": "Movie Info",
         "slug": "movieinfo",
-        "version": "1.0.5",
+        "version": "1.0.6",
         "orientation": "portrait",
         "icon": "./assets/images/icon.png",
         "scheme": "myapp",
@@ -21,10 +21,9 @@
                 "backgroundColor": "#000"
             },
             "package": "com.sdjd.movieinfo",
-            "versionCode": 5
+            "versionCode": 6
         },
         "plugins": [
-            
             "expo-router",
             [
                 "expo-build-properties",
@@ -56,7 +55,7 @@
             "url": "https://u.expo.dev/7376db23-1d11-424c-93d6-a358d7032959"
         },
         "ios": {
-            "buildNumber": "5",
+            "buildNumber": "6",
             "bundleIdentifier": "com.sdjd.movieinfo"
         }
     },
