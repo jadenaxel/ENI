@@ -9,7 +9,7 @@ import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
-import { AdBanner, Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
+import { Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
 import { Ads, Colors, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
@@ -24,7 +24,6 @@ const Search: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
 
-	const CanLoad: boolean = state.BannerAd === "Load";
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
@@ -60,10 +59,7 @@ const Search: FC = (): JSX.Element => {
 	if (error[0]) return <Error deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView
-			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 80 }]}
-		>
-			{CanLoad && <AdBanner ID={Ads.SEARCH_SCREEN_BANNER_V1} />}
+		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={styles.search}>
 					<View

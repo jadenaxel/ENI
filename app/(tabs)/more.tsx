@@ -9,24 +9,19 @@ import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
 
 import { version } from "@/package.json";
-import { Ads, Colors, Constants, Sizes } from "@/config";
-import { AdBanner, Title } from "@/components";
+import { Colors, Constants, Sizes } from "@/config";
+import { Title } from "@/components";
 import { Context } from "@/Wrapper";
 
 const More: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
-
-	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
 	return (
-		<SafeAreaView
-			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
-		>
-			{CanLoad && <AdBanner ID={Ads.MORE_SCREEN_BANNER_V1} />}
+		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView>
 				<Title title="Ajustes" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				{/* <Link href={"/(more)/profile"} asChild style={styles.profile}>

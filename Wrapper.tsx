@@ -13,7 +13,6 @@ const initialValue: any = {
 	SeriesItem: "",
 	Links: "",
 	Categories: [],
-	BannerAd: "Load",
 
 	darkMode: "auto",
 
@@ -29,7 +28,6 @@ export const Actions: any = {
 	SeriesItem: "Series Item",
 	Links: "Links",
 	Categories: "Categories",
-	BannerAd: "BannerAd",
 
 	DarkMode: "Dark Mode",
 
@@ -53,8 +51,6 @@ const reducer = (state: any, action: any): any => {
 			return { ...state, Links: action.payload };
 		case Actions.Categories:
 			return { ...state, Categories: action.payload };
-		case Actions.BannerAd:
-			return { ...state, BannerAd: action.payload };
 
 		case Actions.DarkMode:
 			return { ...state, darkMode: action.payload };

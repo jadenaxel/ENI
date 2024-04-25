@@ -7,7 +7,7 @@ import { View, Text, StyleSheet, Pressable, Linking, useColorScheme, Image } fro
 import { Feather } from "@expo/vector-icons";
 import { WebView } from "react-native-webview";
 
-import { AdBanner, Option } from "@/components";
+import { Option } from "@/components";
 import { Ads, Colors, Constants, Sizes, Url } from "@/config";
 import { Context } from "@/Wrapper";
 
@@ -28,15 +28,12 @@ const Chapter: FC = (): JSX.Element => {
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
-	const CanLoad: boolean = state.BannerAd === "Load";
-
 	const contentTitle = Links.contentTitle;
 
 	const REPORT_SERIES: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Serie"&body="La Serei ${contentTitle} tiene problema. En el capitulo ${title}"`;
 
 	return (
-		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}>
-			{CanLoad && <AdBanner ID={Ads.OPTION_SCREEN_BANNER_V1} />}
+		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<Text style={[styles.chapter, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			{watchOption.length > 0 && (
 				<View>

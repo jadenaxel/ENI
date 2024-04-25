@@ -9,7 +9,7 @@ import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { Ads, Colors, Constants, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
-import { Card, AdBanner } from "@/components";
+import { Card } from "@/components";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
@@ -20,7 +20,6 @@ const Categories: FC = (): JSX.Element => {
 
 	const { state, dispatch }: any = useContext(Context);
 
-	const CanLoad: boolean = state.BannerAd === "Load";
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
@@ -48,10 +47,7 @@ const Categories: FC = (): JSX.Element => {
 	}, []);
 
 	return (
-		<SafeAreaView
-			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
-		>
-			{CanLoad && <AdBanner ID={Ads.CATEGORIES_SCREEN_BANNER_V1} />}
+		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{categories.title}</Text>
 				<View style={styles.data}>

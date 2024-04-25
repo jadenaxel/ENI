@@ -11,7 +11,7 @@ import { Picker } from "@react-native-picker/picker";
 
 import { Actions, Context } from "@/Wrapper";
 import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
-import { AdBanner, CoverModal, Loader, Option, SeasonModal } from "@/components";
+import { CoverModal, Loader, Option, SeasonModal } from "@/components";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
 
@@ -34,7 +34,6 @@ const Item: FC = (): JSX.Element => {
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
 	const done: boolean = sensible === "123show";
-	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const PrincipalColor: string = state.colorOne;
 	const TextColor: string = state.textColor;
@@ -67,8 +66,7 @@ const Item: FC = (): JSX.Element => {
 	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}>
-			{CanLoad && <AdBanner ID={Ads.ITEM_SCREEN_BANNER_V1} />}
+		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<ImageBackground source={{ uri: backgroundURL }} style={styles.background} blurRadius={6}>
 					<View style={styles.backgroundColor}>

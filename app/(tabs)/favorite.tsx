@@ -10,7 +10,7 @@ import { Link, useFocusEffect } from "expo-router";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 
 import { Ads, Constants, LocalStorage, Query, Sizes } from "@/config";
-import { AdBanner, Card, Loader, Title, useFetch } from "@/components";
+import { Card, Loader, Title, useFetch } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
@@ -27,8 +27,6 @@ const More: FC = (): JSX.Element => {
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
-
-	const CanLoad: boolean = state.BannerAd === "Load";
 
 	const { series, movie }: any = data;
 
@@ -61,10 +59,7 @@ const More: FC = (): JSX.Element => {
 	if (loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView
-			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
-		>
-			{CanLoad && <AdBanner ID={Ads.FAVORITE_SCREEN_BANNER_V1} />}
+		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Title title="Favoritas" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				<View style={styles.card}>

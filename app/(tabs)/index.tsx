@@ -10,7 +10,7 @@ import { Link } from "expo-router";
 import * as Updates from "expo-updates";
 
 import { Colors, Ads, Sizes, Constants, Query } from "@/config";
-import { AdBanner, Loader, Card_Section, Title, Home_Slider, Home_Dot, useFetch, Error } from "@/components";
+import { Loader, Card_Section, Title, Home_Slider, Home_Dot, useFetch, Error } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
 const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
@@ -37,7 +37,7 @@ const Home: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 
 	const { isLoaded, isClosed, load, show }: any = useInterstitialAd(AD_STRING);
-	const { store, darkMode, colorOne, BannerAd } = state;
+	const { store, darkMode, colorOne } = state;
 
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
 	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories }).data;
@@ -47,8 +47,6 @@ const Home: FC = (): JSX.Element => {
 
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
-
-	const CanLoad: boolean = BannerAd === "Load";
 
 	const maxScrollX = Sizes.windowWidth * (allData.slice(0, DATA_SIZE_CONTENT).length - 1);
 
@@ -106,10 +104,7 @@ const Home: FC = (): JSX.Element => {
 	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
-		<SafeAreaView
-			style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }, CanLoad && { paddingBottom: 70 }]}
-		>
-			{CanLoad && <AdBanner ID={Ads.HOME_SCREEN_BANNER_V1} />}
+		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
@@ -148,7 +143,7 @@ const Home: FC = (): JSX.Element => {
 					PrincipalColor={colorOne}
 				/>
 				{Categories &&
-					Categories.map((item: any, i: number) => {
+					Categories.slice(0, 5).map((item: any, i: number) => {
 						const content: any = allData
 							.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
 							.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
@@ -177,7 +172,7 @@ const Home: FC = (): JSX.Element => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-		backgroundColor: Colors.background,
+        paddingBottom: 20
 	},
 });
 
