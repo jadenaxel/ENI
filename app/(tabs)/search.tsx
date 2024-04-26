@@ -23,14 +23,13 @@ const Search: FC = (): JSX.Element => {
 
 	const { state, dispatch }: any = useContext(Context);
 	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
+	const { darkMode, Data } = state;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
 
-	state.Data !== undefined ? useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }) : "";
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
-	const { series, movie } = state.Data;
+	const { series, movie } = Data;
 
 	const handleSearch = (e: any) => {
 		if (e.length === 0) {

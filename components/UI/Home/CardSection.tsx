@@ -9,16 +9,7 @@ import { Sizes, Constants } from "@/config";
 import { Actions } from "@/Wrapper";
 import Card from "../Card";
 
-const CardSection: FC<any> = ({
-	data,
-	title,
-	dispatch,
-	isLoaded,
-	show,
-	DATA_SIZE_CONTENT,
-	deviceColor,
-	DarkModeType,
-}: any): JSX.Element => {
+const CardSection: FC<any> = ({ data, title, dispatch, isLoaded, show, DATA_SIZE_CONTENT, deviceColor, DarkModeType }: any): JSX.Element => {
 	return (
 		<View style={styles.main}>
 			<Text style={[styles.lastSeriesTitle, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>

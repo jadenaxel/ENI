@@ -16,20 +16,16 @@ const Item: FC<any> = ({ item, handleDownload }: any): JSX.Element => {
 	const siteName: string = typeOfLink.includes("magnet") ? "Magnet" : typeOfLink.split("/")[2];
 
 	return (
-		<Pressable onPress={() => handleDownload(item, item.index)} style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}>
+		<Pressable onPress={() => handleDownload(typeOfLink, item.index)} style={[styles.option, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}>
 			<Text style={[styles.optionText, { color: Url[siteName]?.text ?? Colors.text }]}>{Url[siteName]?.title ?? siteName}</Text>
 			<Feather name="download" size={15} color={Url[siteName]?.text ?? Colors.text} />
-			{item.lang &&
-				item.lang?.map((langs: any, i: number) => {
-					return <Image source={{ uri: langs.asset.url }} key={i} style={styles.flags} />;
-				})}
+			{item.lang && item.lang?.map((langs: any, i: number) => <Image source={{ uri: langs.asset.url }} key={i} style={styles.flags} />)}
 		</Pressable>
 	);
 };
 
 const Option: FC<any> = ({ data, deviceColor, DarkModeType }: any): JSX.Element => {
 	const [isLoading, setIsLoading] = useState<boolean>(false);
-
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const OpenLink = async (link: string) => {

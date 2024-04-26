@@ -5,11 +5,11 @@ import { useEffect, useState } from "react";
 const controller: AbortController = new AbortController();
 
 const useFetch = (props: Props): Return => {
+	const { uri, dispatch, dispatchType, load = true, errors = true }: Props = props;
+
 	const [data, setData] = useState<any>([]);
 	const [error, setError] = useState<any>([false, "No Error"]);
-	const [isLoading, setIsLoading] = useState<boolean>(true);
-
-	const { uri, dispatch, dispatchType }: Props = props;
+	const [isLoading, setIsLoading] = useState<boolean>(load);
 
 	const callData = async (): Promise<void> => {
 		try {
@@ -17,18 +17,18 @@ const useFetch = (props: Props): Return => {
 
 			if (!request.ok && request.status !== 200) {
 				const errorMessage = await request.text();
-				setError([true, `Error ${request.status}: ${errorMessage}`]);
-				setIsLoading(false);
+				errors && setError([true, `Error ${request.status}: ${errorMessage}`]);
+				load && setIsLoading(false);
 				controller.abort();
 			}
 			const response: any = await request.json();
 			setData(response.result);
 
 			if (dispatch) dispatch({ type: dispatchType, payload: response.result });
-			setIsLoading(false);
+			load && setIsLoading(false);
 		} catch (error: any) {
-			setError([true, error.message]);
-			setIsLoading(false);
+			errors && setError([true, error.message]);
+			load && setIsLoading(false);
 			controller.abort();
 		}
 	};

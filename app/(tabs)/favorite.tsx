@@ -21,12 +21,12 @@ const More: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
+	const { darkMode, Data } = state;
 
-	const data = state.Data.length > 0 ? state.Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
+	const data = Data.length > 0 ? Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
 	const { series, movie }: any = data;
 

@@ -1,5 +1,6 @@
 import type { FC } from "react";
 
+import { memo } from "react";
 import { View, StyleSheet, Animated } from "react-native";
 
 import { Constants, Sizes } from "@/config";
@@ -47,4 +48,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default Dot;
+export default memo(Dot);

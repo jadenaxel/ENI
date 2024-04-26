@@ -8,25 +8,22 @@ import { Feather } from "@expo/vector-icons";
 import { WebView } from "react-native-webview";
 
 import { Option } from "@/components";
-import { Ads, Colors, Constants, Sizes, Url } from "@/config";
+import { Colors, Constants, Sizes, Url } from "@/config";
 import { Context } from "@/Wrapper";
 
 const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
 
-	const { Links } = state;
+	const { Links, colorOne, textColor, darkMode } = state;
 	const { note, title, link, links, watch, watches } = Links.item;
 
 	const isWatchesAvailable: any = watches && watches.hasOwnProperty("link") ? watches[0].link : watch ? watch[0] : "";
 
 	const [watchOption, setWatchOption] = useState<string>(isWatchesAvailable ?? "");
 
-	const PrincipalColor: string = state.colorOne;
-	const TextColor: string = state.textColor;
-
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
 	const contentTitle = Links.contentTitle;
 
@@ -47,7 +44,7 @@ const Chapter: FC = (): JSX.Element => {
 
 							return (
 								<Pressable
-									onPress={() => setWatchOption(wa)}
+									onPress={() => setWatchOption(typeOfLink)}
 									key={i}
 									style={[styles.optionWatch, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}
 								>
@@ -70,11 +67,11 @@ const Chapter: FC = (): JSX.Element => {
 			)}
 			<View>
 				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
-				<Option data={links ?? link} />
+				<Option data={links ?? link} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 			</View>
-			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: PrincipalColor }]}>
-				<Feather name="mail" size={20} color={TextColor} />
-				<Text style={[styles.seriesButtonText, { color: TextColor }]}>Reportar</Text>
+			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: colorOne }]}>
+				<Feather name="mail" size={20} color={textColor} />
+				<Text style={[styles.seriesButtonText, { color: textColor }]}>Reportar</Text>
 			</Pressable>
 		</View>
 	);

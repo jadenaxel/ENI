@@ -2,14 +2,14 @@ import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
 import { useContext, useEffect, useState, useRef } from "react";
-import { Animated, StyleSheet, ScrollView, View, Pressable, useColorScheme } from "react-native";
+import { Animated, StyleSheet, ScrollView, View, Pressable, useColorScheme, FlatList } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
 import { Link } from "expo-router";
 import * as Updates from "expo-updates";
 
-import { Colors, Ads, Sizes, Constants, Query } from "@/config";
+import { Ads, Sizes, Constants, Query } from "@/config";
 import { Loader, Card_Section, Title, Home_Slider, Home_Dot, useFetch, Error } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
@@ -21,10 +21,10 @@ let intervalId: any;
 let currentScrollX = 0;
 let isForward = true;
 
-const onFetchUpdateAsync = async () => {
+const onFetchUpdateAsync = async (store: string) => {
 	try {
 		const update = await Updates.checkForUpdateAsync();
-		if (update.isAvailable) {
+		if (update.isAvailable && store === "123show") {
 			await Updates.fetchUpdateAsync();
 			await Updates.reloadAsync();
 		}
@@ -40,7 +40,7 @@ const Home: FC = (): JSX.Element => {
 	const { store, darkMode, colorOne } = state;
 
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
-	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories }).data;
+	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories, load: false, errors: false }).data;
 
 	const scrollX: any = useRef(new Animated.Value(0)).current;
 	const scrollTo: any = useRef();
@@ -48,37 +48,37 @@ const Home: FC = (): JSX.Element => {
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
-	const maxScrollX = Sizes.windowWidth * (allData.slice(0, DATA_SIZE_CONTENT).length - 1);
+	const maxScrollX: number = allData.slice(0, DATA_SIZE_CONTENT).length - 1;
 
 	const handleOnScroll = (event: any) => Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], { useNativeDriver: false })(event);
 
 	const startAutoScroll = () => {
 		intervalId = setInterval(() => {
 			if (isForward) {
-				// Avanzar
-				currentScrollX += Sizes.windowWidth;
+				currentScrollX += 1;
 				if (currentScrollX > maxScrollX) {
 					currentScrollX = maxScrollX;
-					isForward = false; // Cambia la dirección al final
+					isForward = false;
 				}
 			} else {
-				currentScrollX -= Sizes.windowWidth;
+				currentScrollX -= maxScrollX;
 				if (currentScrollX < 0) {
 					currentScrollX = 0;
-					isForward = true; // Cambia la dirección al inicio
+					isForward = true;
 				}
 			}
-			scrollTo.current?.scrollTo({ x: currentScrollX, y: 0, animated: true });
+			scrollTo.current?.scrollToIndex({
+				index: currentScrollX,
+				animated: true,
+			});
 		}, 5000);
 	};
 
-	const handleMomentumScrollEnd = (event: any) => {
-		currentScrollX = event.nativeEvent.contentOffset.x;
+	const handleMomentumScrollEnd = (): any => {
 		isForward = currentScrollX === 0;
 		clearInterval(intervalId);
+		startAutoScroll();
 	};
-
-	console.log("first");
 
 	useEffect(() => {
 		startAutoScroll();
@@ -89,7 +89,7 @@ const Home: FC = (): JSX.Element => {
 	}, [allData]);
 
 	useEffect(() => {
-		onFetchUpdateAsync();
+		onFetchUpdateAsync(store);
 	}, []);
 
 	useEffect(() => {
@@ -109,32 +109,34 @@ const Home: FC = (): JSX.Element => {
 				<View style={{ paddingHorizontal: Sizes.paddingHorizontal }}>
 					<Title title="Inicio" deviceColor={deviceColor} DarkModeType={DarkModeType} />
 				</View>
-				<ScrollView
+				<FlatList
 					horizontal
 					pagingEnabled
-					showsHorizontalScrollIndicator
+					onScrollToIndexFailed={() => console.log("IDGAF")}
+					showsHorizontalScrollIndicator={false}
 					onScroll={handleOnScroll}
 					ref={scrollTo}
-					onMomentumScrollEnd={(event: any) => handleMomentumScrollEnd(event)}
-				>
-					{allData
-						.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
-						.slice(0, DATA_SIZE_CONTENT)
-						.map((item: any, i: number) => {
-							return (
-								<Link href={"/(content)/item"} asChild key={i}>
-									<Pressable
-										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: { item } });
-											if (isLoaded) show();
-										}}
-									>
-										<Home_Slider item={item} />
-									</Pressable>
-								</Link>
-							);
-						})}
-				</ScrollView>
+					onMomentumScrollEnd={handleMomentumScrollEnd}
+					initialNumToRender={3}
+					maxToRenderPerBatch={7}
+					windowSize={2}
+					removeClippedSubviews
+					data={allData.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
+					updateCellsBatchingPeriod={50}
+					keyExtractor={(item: any) => item._id}
+					renderItem={(item: any) => (
+						<Link href={"/(content)/item"} asChild>
+							<Pressable
+								onPress={() => {
+									dispatch({ type: Actions.SeriesItem, payload: { item: item.item } });
+									if (isLoaded) show();
+								}}
+							>
+								<Home_Slider item={item.item} />
+							</Pressable>
+						</Link>
+					)}
+				/>
 				<Home_Dot
 					data={allData.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt)).slice(0, DATA_SIZE_CONTENT)}
 					scrollX={scrollX}
@@ -142,13 +144,10 @@ const Home: FC = (): JSX.Element => {
 					DarkModeType={DarkModeType}
 					PrincipalColor={colorOne}
 				/>
-				{Categories &&
-					Categories.slice(0, 5).map((item: any, i: number) => {
-						const content: any = allData
-							.sort((a: any, b: any) => b._createdAt.localeCompare(a._createdAt))
-							.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
-
-						if (content.length <= 0) return null;
+				{Categories.slice(0, 5)
+					.filter((item) => allData.some((data: any) => data.categories.some((ca: any) => ca.title === item.title)))
+					.map((item, i) => {
+						const content = allData.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
 
 						return (
 							<Card_Section
@@ -172,7 +171,7 @@ const Home: FC = (): JSX.Element => {
 const styles = StyleSheet.create({
 	main: {
 		flex: 1,
-        paddingBottom: 20
+		paddingBottom: 20,
 	},
 });
 

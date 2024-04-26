@@ -15,10 +15,13 @@ import { Context } from "@/Wrapper";
 
 const More: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
+	const { colorOne, textColor } = state;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkMode: string = state.darkMode;
 	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+
+	const REPORT_ERROR: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Error"`;
 
 	return (
 		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
@@ -38,19 +41,22 @@ const More: FC = (): JSX.Element => {
 						</View>
 					</Pressable>
 				</Link>
+				<View style={{ flexDirection: "row", marginBottom: 20 }}>
+					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>App Version: </Text>
+					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{version}</Text>
+				</View>
 				{/* <Pressable style={styles.settingList}>
 					<Text style={styles.settingListText}>Apps</Text>
 					<Feather name="chevron-right" size={20} color={Colors.text} />
 				</Pressable> */}
-				<Pressable onPress={() => Linking.openURL("https://t.me/ENIDATA")} style={styles.telegram}>
-					<Text style={styles.telegramText}>Unete al nuestro canal</Text>
+				<Pressable onPress={() => Linking.openURL("https://t.me/ENIDATA")} style={[styles.button, { backgroundColor: colorOne }]}>
+					<Text style={[styles.buttonText, { color: textColor }]}>Unete al nuestro canal</Text>
+				</Pressable>
+				<Pressable onPress={() => Linking.openURL(REPORT_ERROR)} style={[styles.button, { backgroundColor: colorOne }]}>
+					<Text style={[styles.buttonText, { color: textColor }]}>Reportar Error</Text>
 				</Pressable>
 				{/* Cambiar color de la app */}
 				{/* Eliminar anuncios */}
-				<View style={{ flexDirection: "row" }}>
-					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>App Version: </Text>
-					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{version}</Text>
-				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -60,15 +66,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingHorizontal: Sizes.paddingHorizontal,
 	},
-	telegram: {
-		marginVertical: 20,
-		backgroundColor: "#0088cc",
+	button: {
+		marginBottom: 10,
 		borderRadius: 4,
 		justifyContent: "center",
 		alignItems: "center",
 		padding: 10,
 	},
-	telegramText: {
+	buttonText: {
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(16),
 	},
@@ -82,6 +87,7 @@ const styles = StyleSheet.create({
 
 		paddingVertical: 10,
 		borderBottomWidth: 1,
+		marginBottom: 10,
 	},
 	settingListText: {
 		fontSize: Sizes.ajustFontSize(16),

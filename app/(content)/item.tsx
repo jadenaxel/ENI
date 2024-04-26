@@ -17,8 +17,9 @@ const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME
 
 const Item: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
-	const ItemData: any = state.SeriesItem.item;
-	const sensible: string = state.store;
+	const { SeriesItem, store, colorOne, darkMode, textColor } = state;
+
+	const ItemData: any = SeriesItem.item;
 
 	const [isLoading, setIsLoading] = useState<boolean>(true);
 	const [modalSeasonVisible, setModalSeasonVisible] = useState<boolean>(false);
@@ -33,19 +34,17 @@ const Item: FC = (): JSX.Element => {
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
-	const done: boolean = sensible === "123show";
-
-	const PrincipalColor: string = state.colorOne;
-	const TextColor: string = state.textColor;
+	const done: boolean = store === "123show";
 
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
 	const getStorageData = async (item: any) => {
 		const contentData = await LocalStorage.getData(contentType, item);
 		setHeart(contentData?.length > 0);
 	};
+
+	console.log("first");
 
 	const handleHeart = async () => {
 		heart ? await LocalStorage.removeData(contentType, _id) : await LocalStorage.saveData(contentType, { _id });
@@ -77,10 +76,10 @@ const Item: FC = (): JSX.Element => {
 						<Pressable onPress={() => handleHeart()} style={styles.heart}>
 							<Feather name="heart" size={30} color={heart ? "red" : "white"} />
 						</Pressable>
-						<Text style={[styles.description, styles.text]} numberOfLines={5}>
+						<Text style={[styles.description, styles.text]} numberOfLines={6}>
 							{description}
 						</Text>
-						<ScrollView contentContainerStyle={styles.ccontent} horizontal showsHorizontalScrollIndicator={false}>
+						<View style={styles.ccontent}>
 							{categories.map((category: any, i: number) => {
 								if (Constants.CATEGORIES.includes(category.title)) return null;
 
@@ -92,19 +91,19 @@ const Item: FC = (): JSX.Element => {
 												if (isLoaded) show();
 											}}
 										>
-											<View style={[styles.categories, { backgroundColor: PrincipalColor }]}>
-												<Text style={[styles.categoriesText, { color: TextColor }]}>{category.title}</Text>
+											<View style={[styles.categories, { backgroundColor: colorOne }]}>
+												<Text style={[styles.categoriesText, { color: textColor }]}>{category.title}</Text>
 											</View>
 										</Pressable>
 									</Link>
 								);
 							})}
-						</ScrollView>
+						</View>
 						<Text style={[styles.year, styles.text]}>Año: {year ?? "-"}</Text>
 						{trailer && (
-							<Pressable style={[styles.trailer, { backgroundColor: PrincipalColor }]} onPress={() => Linking.openURL(trailer)}>
-								<Feather name="play" size={20} color={TextColor} />
-								<Text style={[styles.trailerText, { color: TextColor }]}>Trailer</Text>
+							<Pressable style={[styles.trailer, { backgroundColor: colorOne }]} onPress={() => Linking.openURL(trailer)}>
+								<Feather name="play" size={20} color={textColor} />
+								<Text style={[styles.trailerText, { color: textColor }]}>Trailer</Text>
 							</Pressable>
 						)}
 					</View>
@@ -117,7 +116,7 @@ const Item: FC = (): JSX.Element => {
 								{season.length > 1 && <Feather name="chevron-down" size={20} color={Constants.ColorType("text", deviceColor, DarkModeType)} />}
 							</Pressable>
 							<Pressable style={{ width: "10%" }}>
-								<Picker selectedValue={order} onValueChange={(itemValue: any) => setOrder(itemValue)}>
+								<Picker selectedValue={order} dropdownIconColor={colorOne} onValueChange={(itemValue: any) => setOrder(itemValue)}>
 									<Picker.Item label="Nombre" value="name" />
 									<Picker.Item label="Salida" value="salida" />
 								</Picker>
@@ -137,7 +136,7 @@ const Item: FC = (): JSX.Element => {
 														<Link
 															href={"/(content)/chapter"}
 															key={key}
-															style={[styles.chapter, { backgroundColor: PrincipalColor }]}
+															style={[styles.chapter, { backgroundColor: colorOne }]}
 															asChild
 														>
 															<Pressable
@@ -149,11 +148,11 @@ const Item: FC = (): JSX.Element => {
 																	if (isLoaded) show();
 																}}
 															>
-																<Text style={[styles.chapterTitle, { color: TextColor }]}>{chapter.title}</Text>
+																<Text style={[styles.chapterTitle, { color: textColor }]}>{chapter.title}</Text>
 																<View style={styles.chapterIcons}>
-																	<Feather name="chevron-right" size={25} color={TextColor} />
+																	<Feather name="chevron-right" size={25} color={textColor} />
 																	<Pressable onPress={() => Linking.openURL(chapter.links[0].link ?? chapter.link[0])}>
-																		<Feather name="download" size={25} color={TextColor} />
+																		<Feather name="download" size={25} color={textColor} />
 																	</Pressable>
 																</View>
 															</Pressable>
@@ -168,24 +167,24 @@ const Item: FC = (): JSX.Element => {
 				{season === undefined && done && (
 					<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
 						{(watches || watch) && (
-							<Link href={"/(content)/chapter"} asChild style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
+							<Link href={"/(content)/chapter"} asChild style={[styles.movieButton, { backgroundColor: colorOne }]}>
 								<Pressable
 									onPress={() => {
 										dispatch({ type: Actions.Links, payload: { item: ItemData, contentTitle: title } });
 										if (isLoaded) show();
 									}}
 								>
-									<Feather name="play" size={20} color={TextColor} />
-									<Text style={[styles.movieButtonText, { color: TextColor }]}>Ver</Text>
+									<Feather name="play" size={20} color={textColor} />
+									<Text style={[styles.movieButtonText, { color: textColor }]}>Ver</Text>
 								</Pressable>
 							</Link>
 						)}
 						<Pressable
-							onPress={() => (Linking.openURL(links)?.hasOwnProperty("link") ? links[0].link : link[0])}
-							style={[styles.movieButton, { backgroundColor: PrincipalColor }]}
+							onPress={() => Linking.openURL(links?.hasOwnProperty("link") ? links[0].link : link[0])}
+							style={[styles.movieButton, { backgroundColor: colorOne }]}
 						>
-							<Feather name="download" size={20} color={TextColor} />
-							<Text style={[styles.movieButtonText, { color: TextColor }]}>Descargar</Text>
+							<Feather name="download" size={20} color={textColor} />
+							<Text style={[styles.movieButtonText, { color: textColor }]}>Descargar</Text>
 						</Pressable>
 						{links !== null && links?.hasOwnProperty("link")
 							? links.length >= 1
@@ -197,9 +196,9 @@ const Item: FC = (): JSX.Element => {
 										<Option data={links ? links?.slice(1) : link.slice(1)} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 									</View>
 							  )}
-						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: PrincipalColor }]}>
-							<Feather name="mail" size={20} color={TextColor} />
-							<Text style={[styles.movieButtonText, { color: TextColor }]}>Reportar</Text>
+						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: colorOne }]}>
+							<Feather name="mail" size={20} color={textColor} />
+							<Text style={[styles.movieButtonText, { color: textColor }]}>Reportar</Text>
 						</Pressable>
 					</View>
 				)}
@@ -231,12 +230,14 @@ const styles = StyleSheet.create({
 	},
 	background: {
 		marginBottom: 20,
+		height: Sizes.windowHeight,
 	},
 	backgroundColor: {
-		flex: 1,
+		height: Sizes.windowHeight,
 		backgroundColor: "rgba(0,0,0,.6)",
 		paddingHorizontal: Sizes.paddingHorizontal,
 		paddingBottom: 20,
+		justifyContent: "center",
 	},
 	cover: {
 		alignItems: "center",
@@ -252,19 +253,22 @@ const styles = StyleSheet.create({
 		color: Colors.text,
 		fontSize: Sizes.ajustFontSize(20),
 		textAlign: "center",
-		marginBottom: 10,
+		marginBottom: 20,
 	},
 	heart: {
 		alignItems: "center",
-		marginBottom: 10,
+		marginBottom: 20,
 	},
 	description: {
 		textAlign: "justify",
-		marginBottom: 10,
+		marginBottom: 20,
 	},
 	ccontent: {
-		gap: 10,
-		marginBottom: 10,
+		flexDirection: "row",
+		gap: 5,
+		marginBottom: 20,
+		flexWrap: "wrap",
+		justifyContent: "center",
 	},
 	categories: {
 		backgroundColor: Colors.chapter,
@@ -275,7 +279,8 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(13),
 	},
 	year: {
-		marginBottom: 10,
+		textAlign: "center",
+		marginBottom: 20,
 	},
 	trailer: {
 		height: 40,

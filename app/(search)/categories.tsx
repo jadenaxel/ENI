@@ -19,20 +19,19 @@ const Categories: FC = (): JSX.Element => {
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { state, dispatch }: any = useContext(Context);
+	const { darkMode, Categories, Data } = state;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
-	const categories = state.Categories;
-	const { series, movie } = state.Data;
+	const { series, movie } = Data;
 
 	const loadCategories = () => {
 		const SeriesFiler = series.filter((item: any) =>
-			item.categories.some((category: any) => category.title.toLowerCase() === categories.title.toLowerCase())
+			item.categories.some((category: any) => category.title.toLowerCase() === Categories.title.toLowerCase())
 		);
 		const MovieFiler = movie.filter((item: any) =>
-			item.categories.some((category: any) => category.title.toLowerCase() === categories.title.toLowerCase())
+			item.categories.some((category: any) => category.title.toLowerCase() === Categories.title.toLowerCase())
 		);
 
 		setAllData([...SeriesFiler, ...MovieFiler]);
@@ -49,7 +48,7 @@ const Categories: FC = (): JSX.Element => {
 	return (
 		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
-				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{categories.title}</Text>
+				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{Categories.title}</Text>
 				<View style={styles.data}>
 					{allData
 						.sort((a: any, b: any) => a.title.localeCompare(b.title))
