@@ -30,7 +30,7 @@ const Item: FC = (): JSX.Element => {
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
-	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watch, watches, link, links } = ItemData;
+	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watches, links } = ItemData;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
@@ -149,7 +149,7 @@ const Item: FC = (): JSX.Element => {
 																<Text style={[styles.chapterTitle, { color: textColor }]}>{chapter.title}</Text>
 																<View style={styles.chapterIcons}>
 																	<Feather name="chevron-right" size={25} color={textColor} />
-																	<Pressable onPress={() => Linking.openURL(chapter.links[0].link ?? chapter.link[0])}>
+																	<Pressable onPress={() => Linking.openURL(chapter.links[0].link)}>
 																		<Feather name="download" size={25} color={textColor} />
 																	</Pressable>
 																</View>
@@ -164,7 +164,7 @@ const Item: FC = (): JSX.Element => {
 				)}
 				{season === undefined && done && (
 					<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
-						{(watches || watch) && (
+						{watches && (
 							<Link href={"/(content)/chapter"} asChild style={[styles.movieButton, { backgroundColor: colorOne }]}>
 								<Pressable
 									onPress={() => {
@@ -177,23 +177,18 @@ const Item: FC = (): JSX.Element => {
 								</Pressable>
 							</Link>
 						)}
-						<Pressable
-							onPress={() => Linking.openURL(links?.hasOwnProperty("link") ? links[0].link : link[0])}
-							style={[styles.movieButton, { backgroundColor: colorOne }]}
-						>
+						<Pressable onPress={() => (links ? Linking.openURL(links[0].link) : null)} style={[styles.movieButton, { backgroundColor: colorOne }]}>
 							<Feather name="download" size={20} color={textColor} />
 							<Text style={[styles.movieButtonText, { color: textColor }]}>Descargar</Text>
 						</Pressable>
-						{links !== null && links?.hasOwnProperty("link")
-							? links.length >= 1
-							: link.length >= 1 && (
-									<View>
-										<Text style={[styles.moreOption, styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>
-											Mas Opciones
-										</Text>
-										<Option data={links ? links?.slice(1) : link.slice(1)} deviceColor={deviceColor} DarkModeType={DarkModeType} />
-									</View>
-							  )}
+						{links !== null && links?.hasOwnProperty("link") && (
+							<View>
+								<Text style={[styles.moreOption, styles.text, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>
+									Mas Opciones
+								</Text>
+								<Option data={links?.slice(1)} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+							</View>
+						)}
 						<Pressable onPress={() => Linking.openURL(REPORT_MOVIE)} style={[styles.movieButton, { backgroundColor: colorOne }]}>
 							<Feather name="mail" size={20} color={textColor} />
 							<Text style={[styles.movieButtonText, { color: textColor }]}>Reportar</Text>

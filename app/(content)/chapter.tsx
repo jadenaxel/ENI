@@ -15,11 +15,9 @@ const Chapter: FC = (): JSX.Element => {
 	const { state }: any = useContext(Context);
 
 	const { Links, colorOne, textColor, darkMode } = state;
-	const { note, title, link, links, watch, watches } = Links.item;
+	const { note, title, links, watches } = Links.item;
 
-	const isWatchesAvailable: any = watches && watches.hasOwnProperty("link") ? watches[0].link : watch ? watch[0] : "";
-
-	const [watchOption, setWatchOption] = useState<string>(isWatchesAvailable ?? "");
+	const [watchOption, setWatchOption] = useState<string>(watches ? watches[0]?.link : "");
 
 	const deviceColor: ColorSchemeName = useColorScheme();
 
@@ -38,13 +36,12 @@ const Chapter: FC = (): JSX.Element => {
 						<WebView source={{ uri: watchOption }} allowsFullscreenVideo cacheEnabled contentMode="mobile" />
 					</View>
 					<View style={styles.options}>
-						{(watches || watch).map((wa: any, i: number) => {
-							const typeOfLink = wa.hasOwnProperty("link") ? wa.link : wa;
-							const siteName: string = typeOfLink.split("/")[2];
+						{watches.map((wa: any, i: number) => {
+							const siteName: string = wa.link.split("/")[2];
 
 							return (
 								<Pressable
-									onPress={() => setWatchOption(typeOfLink)}
+									onPress={() => setWatchOption(wa.link)}
 									key={i}
 									style={[styles.optionWatch, { backgroundColor: Url[siteName]?.color ?? Colors.Tint }]}
 								>
@@ -59,20 +56,21 @@ const Chapter: FC = (): JSX.Element => {
 					</View>
 				</Fragment>
 			)}
+			<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
+				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
+				{links && <Option data={links} deviceColor={deviceColor} DarkModeType={DarkModeType} />}
+			</View>
+			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: colorOne }]}>
+				<Feather name="mail" size={20} color={textColor} />
+				<Text style={[styles.seriesButtonText, { color: textColor }]}>Reportar</Text>
+			</Pressable>
+
 			{note && (
 				<View style={styles.noteContainer}>
 					<Text style={[styles.noteTitle]}>Nota</Text>
 					<Text style={styles.noteContent}>{note}</Text>
 				</View>
 			)}
-			<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
-				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
-				<Option data={links ?? link} deviceColor={deviceColor} DarkModeType={DarkModeType} />
-			</View>
-			<Pressable onPress={() => Linking.openURL(REPORT_SERIES)} style={[styles.seriesButton, { backgroundColor: colorOne }]}>
-				<Feather name="mail" size={20} color={textColor} />
-				<Text style={[styles.seriesButtonText, { color: textColor }]}>Reportar</Text>
-			</Pressable>
 		</View>
 	);
 };
@@ -106,6 +104,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		alignItems: "center",
 		gap: 10,
+		justifyContent: "center",
 	},
 	optionWatchText: {
 		fontSize: Sizes.ajustFontSize(15),
@@ -139,7 +138,6 @@ const styles = StyleSheet.create({
 	downloads: {
 		fontSize: Sizes.ajustFontSize(20),
 		marginBottom: 20,
-		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	seriesButton: {
 		borderRadius: 4,
