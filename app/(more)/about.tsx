@@ -28,12 +28,8 @@ const About: FC = (): JSX.Element => {
 				<Text style={[styles.title, TextColor]}>Sobre</Text>
 				<View style={styles.container}>
 					<View style={styles.appVersion}>
-						<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>Version de la app: </Text>
-						<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{version}</Text>
-					</View>
-					<View style={styles.appVersionActual}>
-						<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>Ultima Version de la app: </Text>
-						<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{Constants.ActualVersion}</Text>
+						<Text style={[styles.appText, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Version de la app: </Text>
+						<Text style={[styles.appText, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{version}</Text>
 					</View>
 				</View>
 			</ScrollView>
@@ -62,6 +58,9 @@ const styles = StyleSheet.create({
 	appVersionActual: {
 		flexDirection: "row",
 		marginBottom: 20,
+	},
+	appText: {
+		fontSize: Sizes.ajustFontSize(17),
 	},
 });
 
