@@ -1,7 +1,7 @@
 import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
-import { useContext, useState } from "react";
+import { Fragment, useContext, useState } from "react";
 import { View, Text, StyleSheet, Pressable, Linking, useColorScheme, Image } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
@@ -33,7 +33,7 @@ const Chapter: FC = (): JSX.Element => {
 		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<Text style={[styles.chapter, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{title}</Text>
 			{watchOption.length > 0 && (
-				<View>
+				<Fragment>
 					<View style={styles.webVideo}>
 						<WebView source={{ uri: watchOption }} allowsFullscreenVideo cacheEnabled contentMode="mobile" />
 					</View>
@@ -57,7 +57,7 @@ const Chapter: FC = (): JSX.Element => {
 							);
 						})}
 					</View>
-				</View>
+				</Fragment>
 			)}
 			{note && (
 				<View style={styles.noteContainer}>
@@ -65,7 +65,7 @@ const Chapter: FC = (): JSX.Element => {
 					<Text style={styles.noteContent}>{note}</Text>
 				</View>
 			)}
-			<View>
+			<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
 				<Text style={[styles.downloads, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Descargas</Text>
 				<Option data={links ?? link} deviceColor={deviceColor} DarkModeType={DarkModeType} />
 			</View>
@@ -80,15 +80,16 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 1,
 		backgroundColor: Colors.background,
-		paddingHorizontal: Sizes.paddingHorizontal,
+
 		paddingTop: 50,
 	},
 	chapter: {
 		fontSize: Sizes.ajustFontSize(25),
 		marginBottom: 20,
+		textAlign: "center",
 	},
 	webVideo: {
-		height: Sizes.windowHeight / 5,
+		height: Sizes.windowHeight / 4,
 		marginBottom: 10,
 		backgroundColor: "red",
 	},
@@ -97,6 +98,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		flexWrap: "wrap",
 		marginBottom: 20,
+		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	optionWatch: {
 		padding: 10,
@@ -122,6 +124,7 @@ const styles = StyleSheet.create({
 		gap: 10,
 	},
 	noteContainer: {
+		paddingHorizontal: Sizes.paddingHorizontal,
 		borderRadius: 4,
 		padding: 20,
 		marginBottom: 20,
@@ -136,6 +139,7 @@ const styles = StyleSheet.create({
 	downloads: {
 		fontSize: Sizes.ajustFontSize(20),
 		marginBottom: 20,
+		paddingHorizontal: Sizes.paddingHorizontal,
 	},
 	seriesButton: {
 		borderRadius: 4,
@@ -144,6 +148,7 @@ const styles = StyleSheet.create({
 		justifyContent: "center",
 		alignItems: "center",
 		marginBottom: 10,
+		marginHorizontal: Sizes.paddingHorizontal,
 	},
 	seriesButtonText: {
 		marginLeft: 10,

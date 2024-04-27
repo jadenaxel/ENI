@@ -43,7 +43,7 @@ const Categories: FC = (): JSX.Element => {
 
 	useEffect(() => {
 		loadCategories();
-	}, []);
+	}, [Categories]);
 
 	return (
 		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>

@@ -41,10 +41,6 @@ const More: FC = (): JSX.Element => {
 						);
 					})}
 				</View>
-				{/* <View style={{ flexDirection: "row", marginBottom: 20 }}>
-					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>App Version: </Text>
-					<Text style={{ color: Constants.ColorType("text", deviceColor, DarkModeType) }}>{version}</Text>
-				</View> */}
 				<Pressable onPress={() => Linking.openURL("https://t.me/ENIDATA")} style={[styles.button, { backgroundColor: colorOne }]}>
 					<Text style={[styles.buttonText, { color: textColor }]}>Unete al nuestro canal</Text>
 				</Pressable>

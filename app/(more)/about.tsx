@@ -17,7 +17,7 @@ const About: FC = (): JSX.Element => {
 	const deviceColor: ColorSchemeName = useColorScheme();
 
 	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
-	const [deviceColorState, setDeviceColorState] = useState<string | ColorSchemeName>(DarkModeType);
+	const [deviceColorState, _] = useState<string | ColorSchemeName>(DarkModeType);
 
 	const Color = (type: string) => Constants.ColorType(type, deviceColor, deviceColorState);
 	const TextColor = { color: Color("text") };
