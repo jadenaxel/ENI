@@ -32,4 +32,5 @@ export default {
 
 		setLoading(false);
 	},
+	ActualVersion: "1.0.7",
 };

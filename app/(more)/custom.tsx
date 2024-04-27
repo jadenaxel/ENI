@@ -9,22 +9,21 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Colors, LocalStorage, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
+import { Feather } from "@expo/vector-icons";
 
 const Custom: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 
+	const { darkMode, colorOne, textColor } = state;
+
 	const deviceColor: ColorSchemeName = useColorScheme();
-	const DarkMode: string = state.darkMode;
 
-	const DarkModeType: string | ColorSchemeName = DarkMode === "auto" ? deviceColor : DarkMode;
-
-	const ColorPrincipal: string = state.colorOne;
-	const ColorText: string = state.textColor;
+	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
 	const SchemeColor: any = Constants.SchemeColor;
 
-	const [value, setValue] = useState<string>(ColorPrincipal);
-	const [valueTwo, setValueTwo] = useState<string>(ColorText);
+	const [value, setValue] = useState<string>(colorOne);
+	const [valueTwo, setValueTwo] = useState<string>(textColor);
 	const [deviceColorState, setDeviceColorState] = useState<string | ColorSchemeName>(DarkModeType);
 
 	const Sheet: any = useRef();
@@ -52,43 +51,45 @@ const Custom: FC = (): JSX.Element => {
 		<SafeAreaView style={[styles.main, BGColor]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={[styles.title, TextColor]}>Personalización</Text>
-				<View style={styles.color}>
-					<Fragment>
+				<Fragment>
+					<View style={{ marginBottom: 20 }}>
 						<Text style={[styles.colorActualText, TextColor]}>Color de fondo</Text>
 						<View style={styles.deviceColor}>
 							<Text
 								style={[styles.deviceColorText, BGColorTwo, TextColorTwo]}
 								onPress={() => setColor(Actions.DarkMode, Constants.SchemeColor.auto, Constants.StorageType.DeviceColor)}
 							>
-								Auto
+								{deviceColorState === "auto" ? <Feather name="check" size={25} color={colorOne} /> : "Auto"}
 							</Text>
 							<Text
 								style={[styles.deviceColorText, BGColorTwo, TextColorTwo]}
 								onPress={() => setColor(Actions.DarkMode, Constants.SchemeColor.light, Constants.StorageType.DeviceColor)}
 							>
-								Claro
+								{deviceColorState === "light" ? <Feather name="check" size={25} color={colorOne} /> : "Claro"}
 							</Text>
 							<Text
 								style={[styles.deviceColorText, BGColorTwo, TextColorTwo]}
 								onPress={() => setColor(Actions.DarkMode, Constants.SchemeColor.dark, Constants.StorageType.DeviceColor)}
 							>
-								Oscuro
+								{deviceColorState === "dark" ? <Feather name="check" size={25} color={colorOne} /> : "Oscuro"}
 							</Text>
 						</View>
-					</Fragment>
-					<View>
-						<Text style={[styles.colorActualText, TextColor]}>Color Principal</Text>
-						<Pressable onPress={() => Sheet?.current?.open()} style={[styles.colorPicker, BGColorTwo]}>
-							<View style={[styles.colorActualBox, { backgroundColor: value }]} />
-						</Pressable>
 					</View>
-					<View>
-						<Text style={[styles.colorActualText, TextColor]}>Color de Texto</Text>
-						<Pressable onPress={() => Sheet2?.current?.open()} style={[styles.colorPicker, BGColorTwo]}>
-							<View style={[styles.colorActualBox, { backgroundColor: valueTwo }]} />
-						</Pressable>
+					<View style={styles.colors}>
+						<View style={{ flex: 1 }}>
+							<Text style={[styles.colorActualText, TextColor]}>Color Principal</Text>
+							<Pressable onPress={() => Sheet?.current?.open()} style={[styles.colorPicker, BGColorTwo]}>
+								<View style={[styles.colorActualBox, { backgroundColor: value }]} />
+							</Pressable>
+						</View>
+						<View style={{ flex: 1 }}>
+							<Text style={[styles.colorActualText, TextColor]}>Color de Texto</Text>
+							<Pressable onPress={() => Sheet2?.current?.open()} style={[styles.colorPicker, BGColorTwo]}>
+								<View style={[styles.colorActualBox, { backgroundColor: valueTwo }]} />
+							</Pressable>
+						</View>
 					</View>
-				</View>
+				</Fragment>
 
 				<RBSheet customStyles={{ container: [styles.sheet, BGColor] }} height={Sizes.windowHeight / 2} openDuration={250} ref={Sheet}>
 					<View style={styles.sheetHeader}>
@@ -153,9 +154,6 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(25),
 		textAlign: "center",
 	},
-	color: {
-		gap: 20,
-	},
 	deviceColor: {
 		flexDirection: "row",
 		justifyContent: "space-between",
@@ -167,6 +165,12 @@ const styles = StyleSheet.create({
 		flex: 1,
 		textAlign: "center",
 	},
+	colors: {
+		flexDirection: "row",
+		justifyContent: "space-between",
+		gap: 10,
+	},
+
 	colorPicker: {
 		borderRadius: 4,
 		height: 80,

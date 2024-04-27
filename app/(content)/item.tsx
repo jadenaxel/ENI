@@ -44,8 +44,6 @@ const Item: FC = (): JSX.Element => {
 		setHeart(contentData?.length > 0);
 	};
 
-	console.log("first");
-
 	const handleHeart = async () => {
 		heart ? await LocalStorage.removeData(contentType, _id) : await LocalStorage.saveData(contentType, { _id });
 		setHeart((prev: boolean): boolean => !prev);

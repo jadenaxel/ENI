@@ -4,14 +4,9 @@ import { Stack } from "expo-router";
 
 const More: FC = (): JSX.Element => {
 	return (
-		<Stack
-			screenOptions={{
-				headerShown: false,
-			}}
-		>
-			{/* <Stack.Screen name="profile" /> */}
+		<Stack screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="custom" />
-			{/* <Stack.Screen name="app" /> */}
+			<Stack.Screen name="about" />
 		</Stack>
 	);
 };
