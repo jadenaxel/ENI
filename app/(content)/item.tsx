@@ -6,31 +6,31 @@ import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, 
 
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 import { Picker } from "@react-native-picker/picker";
 
 import { Actions, Context } from "@/Wrapper";
-import { Ads, Colors, Sizes, LocalStorage, Constants } from "@/config";
-import { CoverModal, Loader, Option, SeasonModal } from "@/components";
+import { Ads, Colors, Sizes, LocalStorage, Constants, Query } from "@/config";
+import { CoverModal, Loader, Option, SeasonModal, useFetch, Error } from "@/components";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.CHAPTER_LAST_HOME_INTERSTITIAL_V1;
 
 const Item: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 	const { SeriesItem, store, colorOne, darkMode, textColor } = state;
 
-	const ItemData: any = SeriesItem.item;
+	const { data, isLoading, error } = useFetch({ uri: Query.Content.Query(SeriesItem.item) });
 
-	const [isLoading, setIsLoading] = useState<boolean>(true);
+	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watches, links }: any = !isLoading && data[0];
+
+	const [loading, setLoading] = useState<boolean>(true);
 	const [modalSeasonVisible, setModalSeasonVisible] = useState<boolean>(false);
 	const [modalCoverVisible, setModalCoverVisible] = useState<boolean>(false);
 	const [heart, setHeart] = useState<boolean>(false);
-	const [selectedSeason, setSelectedSeason] = useState<string>(ItemData.season?.at(-1).title ?? "");
+	const [selectedSeason, setSelectedSeason] = useState<string>(season && season.at(-1).title);
 	const [order, setOrder] = useState<string>("Nombre");
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
-
-	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watches, links } = ItemData;
 
 	const contentType: string = season === null || season === undefined ? Constants.MOVIES : Constants.SERIES;
 
@@ -41,7 +41,8 @@ const Item: FC = (): JSX.Element => {
 
 	const getStorageData = async (item: any) => {
 		const contentData = await LocalStorage.getData(contentType, item);
-		setHeart(contentData?.length > 0);
+		setHeart(contentData.length > 0);
+		setLoading(false);
 	};
 
 	const handleHeart = async () => {
@@ -52,15 +53,16 @@ const Item: FC = (): JSX.Element => {
 	const REPORT_MOVIE: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Pelicula"&body="La Pelicula ${title} tiene problema"`;
 
 	useEffect(() => {
-		getStorageData(_id);
-		setIsLoading(false);
-	}, []);
+		if (_id) getStorageData(_id);
+		if (season) setSelectedSeason(season.at(-1).title);
+	}, [_id, season]);
 
 	useEffect(() => {
 		load();
 	}, [load, isClosed]);
 
-	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+	if (error[0]) return <Error deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+	if (isLoading || loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
 
 	return (
 		<View style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
@@ -74,6 +76,14 @@ const Item: FC = (): JSX.Element => {
 						<Pressable onPress={() => handleHeart()} style={styles.heart}>
 							<Feather name="heart" size={30} color={heart ? "red" : "white"} />
 						</Pressable>
+						<View style={styles.likes}>
+							<Pressable onPress={() => handleHeart()} style={styles.heart}>
+								<Feather name="thumbs-up" size={30} color={heart ? "red" : "white"} />
+							</Pressable>
+							<Pressable onPress={() => handleHeart()} style={styles.heart}>
+								<Feather name="thumbs-down" size={30} color={heart ? "red" : "white"} />
+							</Pressable>
+						</View>
 						<Text style={[styles.description, styles.text]} numberOfLines={6}>
 							{description}
 						</Text>
@@ -162,13 +172,13 @@ const Item: FC = (): JSX.Element => {
 							})}
 					</View>
 				)}
-				{season === undefined && done && (
+				{(season === undefined || season === null) && done && (
 					<View style={{ marginHorizontal: Sizes.paddingHorizontal }}>
 						{watches && (
 							<Link href={"/(content)/chapter"} asChild style={[styles.movieButton, { backgroundColor: colorOne }]}>
 								<Pressable
 									onPress={() => {
-										dispatch({ type: Actions.Links, payload: { item: ItemData, contentTitle: title } });
+										dispatch({ type: Actions.Links, payload: { item: "ItemData", contentTitle: title } });
 										if (isLoaded) show();
 									}}
 								>
@@ -223,7 +233,7 @@ const styles = StyleSheet.create({
 	},
 	background: {
 		marginBottom: 20,
-		height: Sizes.windowHeight,
+		// height: Sizes.windowHeight,
 	},
 	backgroundColor: {
 		height: Sizes.windowHeight,
@@ -251,6 +261,11 @@ const styles = StyleSheet.create({
 	heart: {
 		alignItems: "center",
 		marginBottom: 20,
+	},
+	likes: {
+		flexDirection: "row",
+		justifyContent: "center",
+		gap: 30,
 	},
 	description: {
 		textAlign: "justify",

@@ -1,18 +1,22 @@
 import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
-import { useContext } from "react";
-import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme } from "react-native";
+import { useContext, useState, useEffect, useCallback } from "react";
+import { View, Text, StyleSheet, ScrollView, Pressable, Linking, useColorScheme, Image } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
-import { Link } from "expo-router";
+import { Link, useFocusEffect } from "expo-router";
 
-import { Colors, Constants, Sizes, MoreScreen } from "@/config";
-import { Title } from "@/components";
+import { Colors, Constants, Sizes, MoreScreen, LocalStorage } from "@/config";
+import { Loader, Title } from "@/components";
 import { Context } from "@/Wrapper";
 
 const More: FC = (): JSX.Element => {
+	const [profiileImage, setProfileImage] = useState<string>("");
+	const [name, setName] = useState<string>("");
+	const [isLoading, setIsLoading] = useState<boolean>(true);
+
 	const { state }: any = useContext(Context);
 	const { colorOne, textColor, darkMode } = state;
 
@@ -21,10 +25,44 @@ const More: FC = (): JSX.Element => {
 
 	const REPORT_ERROR: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Error"`;
 
+	const getUserData = async () => {
+		const userData = await LocalStorage.getData("profile");
+		if (userData.length <= 0) {
+			setIsLoading(false);
+			return;
+		}
+		const parsingUserData = JSON.parse(userData);
+		setProfileImage(parsingUserData.profiileImage);
+		setName(parsingUserData.name);
+		setIsLoading(false);
+	};
+
+	useFocusEffect(
+		useCallback(() => {
+			getUserData();
+		}, [name, profiileImage])
+	);
+
+	if (isLoading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
+
 	return (
 		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView>
 				<Title title="Ajustes" deviceColor={deviceColor} DarkModeType={DarkModeType} />
+
+				{!profiileImage && (
+					<View style={styles.profile}>
+						<View style={styles.photo}></View>
+						<Text style={styles.profileName}>Ejemplo Sanchez</Text>
+					</View>
+				)}
+				{profiileImage && (
+					<View style={styles.profile}>
+						<Image source={{ uri: profiileImage }} style={styles.photo} />
+						<Text style={styles.profileName}>{name}</Text>
+					</View>
+				)}
+
 				<View style={{ marginBottom: 20 }}>
 					{MoreScreen.menu.map((item: any, i: number) => {
 						return (
@@ -68,7 +106,22 @@ const styles = StyleSheet.create({
 		fontSize: Sizes.ajustFontSize(16),
 	},
 	profile: {
-		marginTop: 20,
+		marginTop: 30,
+		alignItems: "center",
+	},
+	photo: {
+		width: 100,
+		height: 100,
+		backgroundColor: "red",
+		borderRadius: 50,
+		alignSelf: "center",
+		justifyContent: "flex-end",
+		overflow: "hidden",
+		marginBottom: 10,
+	},
+	profileName: {
+		fontSize: Sizes.ajustFontSize(15),
+		marginBottom: 30,
 	},
 	settingList: {
 		flexDirection: "row",

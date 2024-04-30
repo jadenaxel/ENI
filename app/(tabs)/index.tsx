@@ -2,18 +2,17 @@ import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
 import { useContext, useEffect, useState, useRef } from "react";
-import { Animated, StyleSheet, ScrollView, View, Pressable, useColorScheme, FlatList } from "react-native";
+import { Animated, StyleSheet, ScrollView, View, Pressable, useColorScheme, FlatList, Text } from "react-native";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 import { Link } from "expo-router";
-import * as Updates from "expo-updates";
 
 import { Ads, Sizes, Constants, Query } from "@/config";
-import { Loader, Card_Section, Title, Home_Slider, Home_Dot, useFetch, Error } from "@/components";
+import { Loader, Title, Home_Slider, Home_Dot, useFetch, Error, Card, Top } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const DATA_SIZE_CONTENT: number = 10;
 
@@ -21,26 +20,15 @@ let intervalId: any;
 let currentScrollX = 0;
 let isForward = true;
 
-const onFetchUpdateAsync = async (store: string) => {
-	try {
-		const update = await Updates.checkForUpdateAsync();
-		if (update.isAvailable && store === "123show") {
-			await Updates.fetchUpdateAsync();
-			await Updates.reloadAsync();
-		}
-	} catch (error) {}
-};
-
 const Home: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
 
 	const { state, dispatch }: any = useContext(Context);
 
 	const { isLoaded, isClosed, load, show }: any = useInterstitialAd(AD_STRING);
-	const { store, darkMode, colorOne } = state;
+	const { darkMode, colorOne } = state;
 
 	const { data, isLoading, error }: any = useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All });
-	const Categories = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories, load: false, errors: false }).data;
 
 	const scrollX: any = useRef(new Animated.Value(0)).current;
 	const scrollTo: any = useRef();
@@ -89,10 +77,6 @@ const Home: FC = (): JSX.Element => {
 	}, [allData]);
 
 	useEffect(() => {
-		onFetchUpdateAsync(store);
-	}, []);
-
-	useEffect(() => {
 		if (data.hasOwnProperty("movie")) setAllData([...data.movie, ...data.series]);
 	}, [isLoading]);
 
@@ -128,7 +112,7 @@ const Home: FC = (): JSX.Element => {
 						<Link href={"/(content)/item"} asChild>
 							<Pressable
 								onPress={() => {
-									dispatch({ type: Actions.SeriesItem, payload: { item: item.item } });
+									dispatch({ type: Actions.SeriesItem, payload: { item: item.item._id } });
 									if (isLoaded) show();
 								}}
 							>
@@ -144,26 +128,35 @@ const Home: FC = (): JSX.Element => {
 					DarkModeType={DarkModeType}
 					PrincipalColor={colorOne}
 				/>
-				{Categories.slice(0, 5)
-					.filter((item) => allData.some((data: any) => data.categories.some((ca: any) => ca.title === item.title)))
-					.map((item, i) => {
-						const content = allData.filter((data: any) => data.categories.some((ca: any) => ca.title === item.title));
-
-						return (
-							<Card_Section
-								key={i}
-								data={content}
-								title={item.title}
-								dispatch={dispatch}
-								isLoaded={isLoaded}
-								show={show}
-								appstore={store}
-								DATA_SIZE_CONTENT={DATA_SIZE_CONTENT}
-								deviceColor={deviceColor}
-								DarkModeType={DarkModeType}
-							/>
-						);
-					})}
+				<Top title="Top 10 Series" type="series" data={allData} isLoaded={isLoaded} show={show} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+				<Top
+					title="Top 10 Peliculas"
+					type="movies"
+					data={allData}
+					isLoaded={isLoaded}
+					show={show}
+					deviceColor={deviceColor}
+					DarkModeType={DarkModeType}
+				/>
+				<View style={styles.card}>
+					<Text style={styles.cardTitle}>Lo Ultimo</Text>
+					<View style={styles.cardBody}>
+						{allData.slice(0, 15).map((item: any, i: any) => {
+							return (
+								<Link href={"/(content)/item"} asChild key={i}>
+									<Pressable
+										onPress={() => {
+											dispatch({ type: Actions.SeriesItem, payload: { item: item._id } });
+											if (isLoaded) show();
+										}}
+									>
+										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+									</Pressable>
+								</Link>
+							);
+						})}
+					</View>
+				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);
@@ -172,6 +165,20 @@ const styles = StyleSheet.create({
 	main: {
 		flex: 1,
 		paddingBottom: 20,
+	},
+	card: {
+		paddingHorizontal: Sizes.paddingHorizontal,
+		marginTop: 30,
+	},
+	cardTitle: {
+		fontSize: Sizes.ajustFontSize(20),
+		marginBottom: 30,
+	},
+	cardBody: {
+		flexDirection: "row",
+		flexWrap: "wrap",
+		justifyContent: "space-between",
+		gap: 10,
 	},
 });
 

@@ -7,15 +7,15 @@ import { View, Text, StyleSheet, ScrollView, Pressable, useColorScheme } from "r
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Link, useFocusEffect } from "expo-router";
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 
 import { Ads, Constants, LocalStorage, Query, Sizes } from "@/config";
 import { Card, Loader, Title, useFetch } from "@/components";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.FAVORITE_SCREEN_INTERSTITIAL_V1;
 
-const More: FC = (): JSX.Element => {
+const Favorite: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);
 	const [loading, setLoading] = useState<boolean>(true);
 	const [allData, setAllData] = useState<any>([]);
@@ -23,12 +23,10 @@ const More: FC = (): JSX.Element => {
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 	const { darkMode, Data } = state;
 
-	const data = Data.length > 0 ? Data : useFetch({ uri: Query.Home.Query, dispatch, dispatchType: Actions.All }).data;
-
 	const deviceColor: ColorSchemeName = useColorScheme();
 	const DarkModeType: string | ColorSchemeName = darkMode === "auto" ? deviceColor : darkMode;
 
-	const { series, movie }: any = data;
+	const { series, movie }: any = Data;
 
 	const getStorageData = async (): Promise<void> => {
 		const storageDataSeries = await LocalStorage.getData(Constants.SERIES);
@@ -47,13 +45,13 @@ const More: FC = (): JSX.Element => {
 	}, [load, isClosed]);
 
 	useEffect(() => {
-		if (data.length > 0 || data.hasOwnProperty("movie")) setLoading(false);
-	}, [data]);
+		if (Data.length > 0 || Data.hasOwnProperty("movie")) setLoading(false);
+	}, [Data]);
 
 	useFocusEffect(
 		useCallback(() => {
 			getStorageData();
-		}, [data])
+		}, [Data])
 	);
 
 	if (loading) return <Loader deviceColor={deviceColor} DarkModeType={DarkModeType} />;
@@ -68,7 +66,7 @@ const More: FC = (): JSX.Element => {
 							<Link key={i} href={"/(content)/item"} asChild>
 								<Pressable
 									onPress={() => {
-										dispatch({ type: Actions.SeriesItem, payload: { item } });
+										dispatch({ type: Actions.SeriesItem, payload: { item: item._id } });
 										if (isLoaded) show();
 									}}
 								>
@@ -107,4 +105,4 @@ const styles = StyleSheet.create({
 	},
 });
 
-export default More;
+export default Favorite;

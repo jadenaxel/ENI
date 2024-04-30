@@ -6,10 +6,10 @@ import { View, Text, StyleSheet, Pressable, TouchableWithoutFeedback, TouchableO
 
 import RBSheet from "react-native-raw-bottom-sheet";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Feather } from "@expo/vector-icons";
 
 import { Colors, LocalStorage, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
-import { Feather } from "@expo/vector-icons";
 
 const Custom: FC = (): JSX.Element => {
 	const { state, dispatch }: any = useContext(Context);

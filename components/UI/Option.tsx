@@ -6,10 +6,10 @@ import { Text, StyleSheet, Pressable, Linking, Alert, Image, View } from "react-
 import { Ads, Colors, Sizes, Url } from "@/config";
 import { Feather } from "@expo/vector-icons";
 
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 import Loader from "./Loader";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.DOWNLOAD_SCREEN_INTERSTITIAL_V1;
 
 const Item: FC<any> = ({ item, handleDownload }: any): JSX.Element => {
 	const siteName: string = item.link.includes("magnet") ? "Magnet" : item.link.split("/")[2];

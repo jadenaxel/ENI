@@ -7,13 +7,13 @@ import { View, Text, StyleSheet, ScrollView, TextInput, Pressable, useColorSchem
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 
 import { Loader, useFetch, Error, CategoriesCard as CCard, Card } from "@/components";
 import { Ads, Colors, Query, Sizes, Constants } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Search: FC = (): JSX.Element => {
 	const [search, setSearch] = useState<string>("");
@@ -22,7 +22,7 @@ const Search: FC = (): JSX.Element => {
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
 	const { state, dispatch }: any = useContext(Context);
-	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query });
+	const { data, isLoading, error } = useFetch({ uri: Query.Search.Query, dispatch, dispatchType: Actions.Categories });
 	const { darkMode, Data } = state;
 
 	const deviceColor: ColorSchemeName = useColorScheme();
@@ -147,7 +147,7 @@ const Search: FC = (): JSX.Element => {
 								<Link key={i} href={"/(content)/item"} asChild>
 									<Pressable
 										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: { item } });
+											dispatch({ type: Actions.SeriesItem, payload: { item: item._id } });
 											if (isLoaded) show();
 										}}
 									>

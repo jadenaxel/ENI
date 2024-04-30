@@ -5,13 +5,13 @@ import { useContext, useState, useEffect } from "react";
 import { View, Text, StyleSheet, Pressable, ScrollView, useColorScheme, SafeAreaView } from "react-native";
 
 import { Link } from "expo-router";
-import { useInterstitialAd, TestIds } from "react-native-google-mobile-ads";
+import { useInterstitialAd } from "react-native-google-mobile-ads";
 
 import { Ads, Colors, Constants, Sizes } from "@/config";
 import { Actions, Context } from "@/Wrapper";
 import { Card } from "@/components";
 
-const AD_STRING: string = __DEV__ ? TestIds.INTERSTITIAL : Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
+const AD_STRING: string = Ads.SERIES_LAST_HOME_INTERSTITIAL_V1;
 
 const Categories: FC = (): JSX.Element => {
 	const [allData, setAllData] = useState<any>([]);
@@ -49,23 +49,54 @@ const Categories: FC = (): JSX.Element => {
 		<SafeAreaView style={[styles.main, { backgroundColor: Constants.ColorType("background", deviceColor, DarkModeType) }]}>
 			<ScrollView showsVerticalScrollIndicator={false}>
 				<Text style={[styles.title, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>{Categories.title}</Text>
-				<View style={styles.data}>
-					{allData
-						.sort((a: any, b: any) => a.title.localeCompare(b.title))
-						.map((item: any, i: number) => {
-							return (
-								<Link key={i} href={"/(content)/item"} asChild>
-									<Pressable
-										onPress={() => {
-											dispatch({ type: Actions.SeriesItem, payload: { item } });
-											if (isLoaded) show();
-										}}
-									>
-										<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
-									</Pressable>
-								</Link>
-							);
-						})}
+
+				<View>
+					<Text style={[styles.top, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Top 3</Text>
+					<View style={styles.data}>
+						{allData
+							.sort((a: any, b: any) => {
+								const like1 = a.like ?? 0;
+								const like2 = b.like ?? 0;
+
+								return like2 - like1;
+							})
+							.slice(0, 3)
+							.map((item: any, i: number) => {
+								return (
+									<Link key={i} href={"/(content)/item"} asChild>
+										<Pressable
+											onPress={() => {
+												dispatch({ type: Actions.SeriesItem, payload: { item: item._id } });
+												if (isLoaded) show();
+											}}
+										>
+											<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+										</Pressable>
+									</Link>
+								);
+							})}
+					</View>
+				</View>
+				<View>
+					<Text style={[styles.top, { color: Constants.ColorType("text", deviceColor, DarkModeType) }]}>Todas</Text>
+					<View style={styles.data}>
+						{allData
+							.sort((a: any, b: any) => a.title.localeCompare(b.title))
+							.map((item: any, i: number) => {
+								return (
+									<Link key={i} href={"/(content)/item"} asChild>
+										<Pressable
+											onPress={() => {
+												dispatch({ type: Actions.SeriesItem, payload: { item: item._id } });
+												if (isLoaded) show();
+											}}
+										>
+											<Card item={item} deviceColor={deviceColor} DarkModeType={DarkModeType} />
+										</Pressable>
+									</Link>
+								);
+							})}
+					</View>
 				</View>
 			</ScrollView>
 		</SafeAreaView>
@@ -79,8 +110,12 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: Sizes.ajustFontSize(25),
-		color: Colors.text,
 		marginTop: 40,
+		marginBottom: 30,
+	},
+	top: {
+		fontSize: Sizes.ajustFontSize(20),
+
 		marginBottom: 30,
 	},
 	data: {

@@ -6,8 +6,9 @@ import LocalStorage from "./LocalStorage";
 import Constants from "./Constants";
 import { Url } from "./Url";
 import MoreScreen from "./MoreScreen";
+import DB from "./DB";
 
 import type { Props, Return } from "./Types";
 
-export { Colors, Ads, Sizes, Query, LocalStorage, Constants, Url, MoreScreen };
+export { Colors, Ads, Sizes, Query, LocalStorage, Constants, Url, MoreScreen, DB };
 export type { Props, Return };

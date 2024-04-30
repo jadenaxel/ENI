@@ -34,6 +34,12 @@
                         "buildToolsVersion": "34.0.0"
                     }
                 }
+            ],
+            [
+                "expo-image-picker",
+                {
+                    "photosPermission": "The app accesses your photos to set your profile."
+                }
             ]
         ],
         "experiments": {
@@ -46,17 +52,6 @@
             "eas": {
                 "projectId": "7376db23-1d11-424c-93d6-a358d7032959"
             }
-        },
-        "runtimeVersion": "1.0.9",
-        "updates": {
-            "enabled": true,
-            "fallbackToCacheTimeout": 300000,
-            "checkAutomatically": "ON_ERROR_RECOVERY",
-            "url": "https://u.expo.dev/7376db23-1d11-424c-93d6-a358d7032959"
-        },
-        "ios": {
-            "buildNumber": "9",
-            "bundleIdentifier": "com.sdjd.movieinfo"
         }
     },
     "react-native-google-mobile-ads": {

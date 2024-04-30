@@ -7,6 +7,7 @@ const More: FC = (): JSX.Element => {
 		<Stack screenOptions={{ headerShown: false }}>
 			<Stack.Screen name="custom" />
 			<Stack.Screen name="about" />
+			<Stack.Screen name="profile" />
 		</Stack>
 	);
 };
