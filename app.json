@@ -24,6 +24,7 @@
             "versionCode": 9
         },
         "plugins": [
+            "@react-native-firebase/app",
             "expo-router",
             [
                 "expo-build-properties",

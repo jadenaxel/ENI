@@ -32,4 +32,5 @@ export default {
 
 		setLoading(false);
 	},
+	Token: "skuKMUfkA9dNrFTq2QHufk1kTqx6Neh73xJ8htYSmiwgRE9NmbiCQ4PAs2xWn8rA7p5RKF9tG4GnA3e59PNbhXbe19AjKQImzo1EkDF5D3EkcuNwbnmc7L26lmXujl0cRrmb6nmUPRCXjduY6yi2KuJwbBMuIzwlA2ZONp1qsef5SDLXXaCW",
 };

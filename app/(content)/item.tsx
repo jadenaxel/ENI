@@ -2,7 +2,7 @@ import type { FC } from "react";
 import type { ColorSchemeName } from "react-native";
 
 import { Fragment, useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, useColorScheme } from "react-native";
+import { View, Text, StyleSheet, ImageBackground, Image, Pressable, ScrollView, Linking, useColorScheme, Alert } from "react-native";
 
 import { Feather } from "@expo/vector-icons";
 import { Link } from "expo-router";
@@ -21,14 +21,25 @@ const Item: FC = (): JSX.Element => {
 
 	const { data, isLoading, error } = useFetch({ uri: Query.Content.Query(SeriesItem.item) });
 
-	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watches, links }: any = !isLoading && data[0];
+	const { _id, backgroundURL, coverURL, year, title, description, season, categories, trailer, watches, links, like, dislike }: any = !isLoading && data[0];
 
 	const [loading, setLoading] = useState<boolean>(true);
+
 	const [modalSeasonVisible, setModalSeasonVisible] = useState<boolean>(false);
 	const [modalCoverVisible, setModalCoverVisible] = useState<boolean>(false);
+
 	const [heart, setHeart] = useState<boolean>(false);
+
 	const [selectedSeason, setSelectedSeason] = useState<string>(season && season.at(-1).title);
 	const [order, setOrder] = useState<string>("Nombre");
+
+	const [numbLike, setNumbLike] = useState<number>(0);
+	const [numbDislikes, setNumbDislikes] = useState<number>(0);
+
+	const [isLiked, setIsLiked] = useState<boolean | null>();
+	const [disabledLike, setDisabledLike] = useState<boolean>(false);
+	
+    const [isLike, setIsLike] = useState<boolean | null>();
 
 	const { isLoaded, isClosed, load, show } = useInterstitialAd(AD_STRING);
 
@@ -50,12 +61,112 @@ const Item: FC = (): JSX.Element => {
 		setHeart((prev: boolean): boolean => !prev);
 	};
 
+	const handleLike = async (type: number) => {
+		const profile = await LocalStorage.getData("profile");
+		if (profile.length <= 0) {
+			Alert.alert("Debes de completar tus datos en el perfil.");
+			return;
+		}
+
+		setDisabledLike(true);
+
+		if ((type === 1 && isLiked) || (type === 0 && !isLiked)) {
+			setDisabledLike(false);
+			return;
+		}
+
+		if (type === 1) {
+			setNumbLike((prev) => prev + 1);
+			setNumbDislikes((prev) => (prev === 0 ? 0 : prev - 1));
+		} else {
+			setNumbDislikes((prev) => prev + 1);
+			setNumbLike((prev) => (prev === 0 ? 0 : prev - 1));
+		}
+
+		const result = await createSanityDocument(_id, type);
+
+		if (!result.results[0]["operation"]) {
+			setDisabledLike(false);
+			Alert.alert("Error al actualizar");
+			return;
+		}
+
+		await LocalStorage.removeData("like", _id);
+		await LocalStorage.saveData("like", { _id, type });
+
+		setIsLiked(type === 1);
+		setDisabledLike(false);
+	};
+
+	const createSanityDocument = async (_id: string, type: number) => {
+		const incLike = {
+			inc: { like: 1 },
+			dec: {
+				dislike: isLike && 1,
+			},
+		};
+		const incDislike = {
+			inc: { dislike: 1 },
+			dec: {
+				like: isLike && 1,
+			},
+		};
+
+		const typeOfInc = type === 1 ? incLike : incDislike;
+
+		try {
+			const result = await fetch("https://cq8lnnm2.api.sanity.io/v2022-03-07/data/mutate/production", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${Constants.Token}`,
+				},
+				body: JSON.stringify({
+					mutations: [
+						{
+							patch: {
+								query: `*[_id == $id]`,
+								params: {
+									id: _id,
+								},
+								setIfMissing: {
+									like: 0,
+									dislike: 0,
+								},
+								...typeOfInc,
+							},
+						},
+					],
+				}),
+			});
+			return await result.json();
+		} catch (e: any) {}
+	};
+
+	const getLikes = async () => {
+		const data = await LocalStorage.getData("like", _id);
+
+		if (data.length <= 0) return;
+
+		setIsLike(true);
+
+		const type = data[0].type;
+
+		setIsLiked(type === 1);
+	};
+
 	const REPORT_MOVIE: string = `mailto:jondydiaz07@gmail.com?subject="Reportar Pelicula"&body="La Pelicula ${title} tiene problema"`;
+
+	useEffect(() => {
+		if (_id) getLikes();
+	}, [_id]);
 
 	useEffect(() => {
 		if (_id) getStorageData(_id);
 		if (season) setSelectedSeason(season.at(-1).title);
-	}, [_id, season]);
+		if (like) setNumbLike(like);
+		if (dislike) setNumbDislikes(dislike);
+	}, [_id, season, like, dislike]);
 
 	useEffect(() => {
 		load();
@@ -73,15 +184,17 @@ const Item: FC = (): JSX.Element => {
 							<Image style={styles.coverImage} source={{ uri: coverURL }} />
 						</Pressable>
 						<Text style={styles.title}>{title}</Text>
-						<Pressable onPress={() => handleHeart()} style={styles.heart}>
+						<Pressable onPress={handleHeart} style={styles.heart}>
 							<Feather name="heart" size={30} color={heart ? "red" : "white"} />
 						</Pressable>
 						<View style={styles.likes}>
-							<Pressable onPress={() => handleHeart()} style={styles.heart}>
-								<Feather name="thumbs-up" size={30} color={heart ? "red" : "white"} />
+							<Pressable onPress={() => !disabledLike && handleLike(1)} style={styles.heart}>
+								<Text style={styles.likesText}>{numbLike ?? 0}</Text>
+								<Feather name="thumbs-up" size={30} color={isLiked !== undefined && isLiked ? "red" : "white"} />
 							</Pressable>
-							<Pressable onPress={() => handleHeart()} style={styles.heart}>
-								<Feather name="thumbs-down" size={30} color={heart ? "red" : "white"} />
+							<Pressable onPress={() => !disabledLike && handleLike(0)} style={styles.heart}>
+								<Text style={styles.likesText}>{numbDislikes ?? 0}</Text>
+								<Feather name="thumbs-down" size={30} color={isLiked !== undefined && !isLiked ? "red" : "white"} />
 							</Pressable>
 						</View>
 						<Text style={[styles.description, styles.text]} numberOfLines={6}>
@@ -266,6 +379,12 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "center",
 		gap: 30,
+	},
+	likesText: {
+		color: Colors.text,
+		fontSize: Sizes.ajustFontSize(),
+		textAlign: "center",
+		marginBottom: 5,
 	},
 	description: {
 		textAlign: "justify",
